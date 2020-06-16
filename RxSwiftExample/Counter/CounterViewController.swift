@@ -19,10 +19,14 @@ class CounterViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    print("viewDidLoad CounterViewController")
 
     // Do any additional setup after loading the view.
     //    setViewModel(viewModel: CounterViewModel())
     bind()
+  }
+  deinit {
+    print("deinit CounterViewController")
   }
 
   func setViewModel(viewModel:CounterViewModelProtocol){
@@ -33,25 +37,21 @@ class CounterViewController: UIViewController {
   func bind(){
     btnPlus.rx.tap
       .subscribe(onNext: {[unowned self] _ in
-        self.viewModel.count.accept(self.viewModel.count.value + 1)
-
+       self.viewModel.countUp()
       })
       .disposed(by: disposeBag)
 
     btnMinus.rx.tap
       .subscribe(onNext: {[unowned self] _ in
-        self.viewModel.count.accept(self.viewModel.count.value - 1)
+        self.viewModel.countDown()
 
       })
       .disposed(by: disposeBag)
 
-    viewModel.count.asDriver()
-      .drive(onNext: { (element) in
-        print(element)
-        self.countLabel.text = "\(element)"
-      })
+    viewModel.count.map{"\($0)"}
+      .bind(to:self.countLabel.rx.text)
       .disposed(by: disposeBag)
-    
+
 
   }
 }
