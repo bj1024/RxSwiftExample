@@ -17,6 +17,8 @@
 		2016375724978E1E00291257 /* RxSwiftExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016375624978E1E00291257 /* RxSwiftExampleUITests.swift */; };
 		201637662497907F00291257 /* CounterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201637652497907F00291257 /* CounterViewController.swift */; };
 		201637682497908E00291257 /* Counter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201637672497908E00291257 /* Counter.storyboard */; };
+		2016376B2498454500291257 /* GitHubSearch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2016376A2498454500291257 /* GitHubSearch.storyboard */; };
+		2016376D2498455600291257 /* GitHubSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016376C2498455600291257 /* GitHubSearchViewController.swift */; };
 		333ACFD1C00ED79EE9003B05 /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BEE3AC05A220D9BAB8A825C /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework */; };
 		5B5F3A22D152E3D75016B691 /* Pods_RxSwiftExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 163C85011865502E08EC277C /* Pods_RxSwiftExample.framework */; };
 		984CA6D0DF0209CEDDF821E7 /* Pods_RxSwiftExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E42DB379E8B135F195D6658 /* Pods_RxSwiftExampleTests.framework */; };
@@ -59,6 +61,8 @@
 		2016375824978E1E00291257 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		201637652497907F00291257 /* CounterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterViewController.swift; sourceTree = "<group>"; };
 		201637672497908E00291257 /* Counter.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Counter.storyboard; sourceTree = "<group>"; };
+		2016376A2498454500291257 /* GitHubSearch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = GitHubSearch.storyboard; sourceTree = "<group>"; };
+		2016376C2498455600291257 /* GitHubSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSearchViewController.swift; sourceTree = "<group>"; };
 		5BEE3AC05A220D9BAB8A825C /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxSwiftExample_RxSwiftExampleUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E42DB379E8B135F195D6658 /* Pods_RxSwiftExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxSwiftExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B08E569ACC3E00AB042DC1 /* Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig"; path = "Target Support Files/Pods-RxSwiftExample-RxSwiftExampleUITests/Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -120,6 +124,7 @@
 		2016373324978E1D00291257 /* RxSwiftExample */ = {
 			isa = PBXGroup;
 			children = (
+				20163769249843E800291257 /* GitHubSearch */,
 				201637642497900600291257 /* Counter */,
 				2016373424978E1D00291257 /* AppDelegate.swift */,
 				2016373624978E1D00291257 /* SceneDelegate.swift */,
@@ -157,6 +162,15 @@
 				201637672497908E00291257 /* Counter.storyboard */,
 			);
 			path = Counter;
+			sourceTree = "<group>";
+		};
+		20163769249843E800291257 /* GitHubSearch */ = {
+			isa = PBXGroup;
+			children = (
+				2016376A2498454500291257 /* GitHubSearch.storyboard */,
+				2016376C2498455600291257 /* GitHubSearchViewController.swift */,
+			);
+			path = GitHubSearch;
 			sourceTree = "<group>";
 		};
 		94E9222710B7C6AF62AA04BD /* Pods */ = {
@@ -295,6 +309,7 @@
 				201637682497908E00291257 /* Counter.storyboard in Resources */,
 				2016373E24978E1E00291257 /* Assets.xcassets in Resources */,
 				2016373C24978E1D00291257 /* Main.storyboard in Resources */,
+				2016376B2498454500291257 /* GitHubSearch.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +439,7 @@
 			files = (
 				2016373924978E1D00291257 /* ViewController.swift in Sources */,
 				201637662497907F00291257 /* CounterViewController.swift in Sources */,
+				2016376D2498455600291257 /* GitHubSearchViewController.swift in Sources */,
 				2016373524978E1D00291257 /* AppDelegate.swift in Sources */,
 				2016373724978E1D00291257 /* SceneDelegate.swift in Sources */,
 			);
