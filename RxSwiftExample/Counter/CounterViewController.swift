@@ -10,35 +10,42 @@ class CounterViewController: UIViewController {
   @IBOutlet weak var btnPlus: UIButton!
   @IBOutlet weak var btnMinus: UIButton!
 
-  private var count = BehaviorRelay<Int>(value: 0)
+
+  private var viewModel:CounterViewModelProtocol = CounterViewModel()
 
   private let disposeBag = DisposeBag()
+
 
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     // Do any additional setup after loading the view.
+//    setViewModel(viewModel: CounterViewModel())
     bind()
+  }
+
+  func setViewModel(viewModel:CounterViewModelProtocol){
+    self.viewModel = viewModel
   }
 
 
   func bind(){
     btnPlus.rx.tap
       .subscribe(onNext: {[unowned self] _ in
-        self.count.accept(self.count.value + 1)
+        self.viewModel.count.accept(self.viewModel.count.value + 1)
 
       })
       .disposed(by: disposeBag)
 
     btnMinus.rx.tap
       .subscribe(onNext: {[unowned self] _ in
-        self.count.accept(self.count.value - 1)
+        self.viewModel.count.accept(self.viewModel.count.value - 1)
 
       })
       .disposed(by: disposeBag)
 
-    count.asDriver()
+    viewModel.count.asDriver()
       .drive(onNext: { (element) in
         print(element)
         self.countLabel.text = "\(element)"
