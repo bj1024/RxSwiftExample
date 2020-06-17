@@ -77,7 +77,7 @@ extension ViewController:UITableViewDataSource{
     
     let menuIdx = indexPath.row
     cell.accessoryType = .disclosureIndicator
-    cell.textLabel?.text = "\(menuIdx + 1).\(menus[menuIdx].name)"
+    cell.textLabel?.text = "\(menuIdx + 1)  \(menus[menuIdx].name)"
     return cell
   }
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
