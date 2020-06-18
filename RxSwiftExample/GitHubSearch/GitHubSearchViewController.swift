@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020, mycompany All rights reserved. 
+// Copyright (c) 2020, mycompany All rights reserved.
 //
 
 import UIKit
@@ -7,13 +7,10 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-
-
 class GitHubSearchViewController: UIViewController {
+  private var viewModel: GitHubSearchViewModelProtocol = GitHubSearchViewModel()
 
-  private var viewModel:GitHubSearchViewModelProtocol = GitHubSearchViewModel()
-
-  private var isBinded:Bool  = false
+  private var isBinded: Bool = false
   private let disposeBag = DisposeBag()
 
   @IBOutlet var tableView: UITableView!
@@ -22,10 +19,9 @@ class GitHubSearchViewController: UIViewController {
 
   let searchController = UISearchController(searchResultsController: nil)
 
-
   override func viewDidLoad() {
     super.viewDidLoad()
-     print("viewDidLoad GitHubSearchViewController")
+    print("viewDidLoad GitHubSearchViewController")
 //    tableView.delegate = self
 //       tableView.dataSource = self
 
@@ -33,8 +29,6 @@ class GitHubSearchViewController: UIViewController {
     searchController.obscuresBackgroundDuringPresentation = false
     searchController.searchBar.autocapitalizationType = .none
     navigationItem.searchController = searchController
-
-
   }
 
   deinit {
@@ -42,22 +36,23 @@ class GitHubSearchViewController: UIViewController {
   }
 
   override func viewDidAppear(_ animated: Bool) {
-     super.viewDidAppear(animated)
-     UIView.setAnimationsEnabled(false)
-     searchController.isActive = true
-     searchController.isActive = false
-     UIView.setAnimationsEnabled(true)
+    super.viewDidAppear(animated)
+    UIView.setAnimationsEnabled(false)
+    searchController.isActive = true
+    searchController.isActive = false
+    UIView.setAnimationsEnabled(true)
 
     if !isBinded {
       bind()
       isBinded = true
     }
   }
-  func setViewModel(viewModel:GitHubSearchViewModelProtocol){
+
+  func setViewModel(viewModel: GitHubSearchViewModelProtocol) {
     self.viewModel = viewModel
   }
 
-  func bind(){
+  func bind() {
     // Action
 
     // orEmpty
@@ -66,11 +61,11 @@ class GitHubSearchViewController: UIViewController {
     searchTextObservable
       .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
       .subscribe(onNext: { [unowned self] event in
-          print("tap event: \(event)")
-        self.viewModel.setKeyword(kw:event)
+        print("tap event: \(event)")
+        self.viewModel.setKeyword(kw: event)
       })
 
-    .disposed(by: disposeBag)
+      .disposed(by: disposeBag)
 //
 //    viewModel.keyword
 //    .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
@@ -79,23 +74,23 @@ class GitHubSearchViewController: UIViewController {
 //    .disposed(by: disposeBag)
 
     viewModel.results
-         .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
-           cell.textLabel?.text = repo
-         }
-         .disposed(by: disposeBag)
+      .bind(to: tableView.rx.items(cellIdentifier: "cell")) { _, repo, cell in
+        cell.textLabel?.text = repo
+      }
+      .disposed(by: disposeBag)
 
     viewModel.isProcessing
       .observeOn(MainScheduler.instance)
-    .subscribe(onNext: { [unowned self] val in
-      self.activityIndicator.isHidden = !val
-      if val {
-        self.activityIndicator.startAnimating()
-      }
-      else{
-        self.activityIndicator.stopAnimating()
-      }
-     })
-     .disposed(by: disposeBag)
+      .subscribe(onNext: { [unowned self] val in
+        self.activityIndicator.isHidden = !val
+        if val {
+          self.activityIndicator.startAnimating()
+        }
+        else {
+          self.activityIndicator.stopAnimating()
+        }
+      })
+      .disposed(by: disposeBag)
 
 //    viewModel.isProcessing.map{ !$0 }
 //      .bind(to: activityIndicator.rx.isHidden)
@@ -103,17 +98,15 @@ class GitHubSearchViewController: UIViewController {
 //    viewModel.isProcessing.map{ $0 }
 //      .bind(to: activityIndicator.rx.isAnimating)
 //    .disposed(by: disposeBag)
-
   }
-
 }
 
 //
-//extension GitHubSearchViewController:UITableViewDelegate{
+// extension GitHubSearchViewController:UITableViewDelegate{
 //
-//}
+// }
 //
-//extension GitHubSearchViewController:UITableViewDataSource{
+// extension GitHubSearchViewController:UITableViewDataSource{
 //
 //  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //
@@ -138,6 +131,4 @@ class GitHubSearchViewController: UIViewController {
 //  }
 //
 //
-//}
-
-
+// }

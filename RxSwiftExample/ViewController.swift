@@ -1,74 +1,66 @@
 //
-// Copyright (c) 2020, mycompany All rights reserved. 
+// Copyright (c) 2020, mycompany All rights reserved.
 //
 
-import UIKit
 import RxCocoa
 import RxSwift
+import UIKit
 
 class ViewController: UIViewController {
-  
   @IBOutlet weak var tableView: UITableView!
 
-  private var isBinded:Bool  = false
+  private var isBinded: Bool = false
   private let disposeBag = DisposeBag()
 
-  enum ViewControllerDef{
+  enum ViewControllerDef {
     case counter
     case gitHubSearch
     case rxDatasourceTable
 
-
-    func getVC() -> UIViewController{
-      var storyboardName:String
-      var id:String
+    func getVC() -> UIViewController {
+      var storyboardName: String
+      var id: String
       switch self {
-
       case .counter:
-        storyboardName="Counter"
-        id="CounterViewController"
+        storyboardName = "Counter"
+        id = "CounterViewController"
       case .gitHubSearch:
-        storyboardName="GitHubSearch"
-        id="GitHubSearchViewController"
-
+        storyboardName = "GitHubSearch"
+        id = "GitHubSearchViewController"
 
       case .rxDatasourceTable:
-        storyboardName="RxDatasourceTable"
-        id="RxDatasourceTableViewController"
+        storyboardName = "RxDatasourceTable"
+        id = "RxDatasourceTableViewController"
       }
 
       let storyboard = UIStoryboard(name: storyboardName, bundle: nil)
       let vc = storyboard.instantiateViewController(withIdentifier: id)
       return vc
     }
+  }
 
+  struct Menu {
+    var name: String
+    var vcdef: ViewControllerDef
   }
-  struct Menu{
-    var name:String
-    var vcdef:ViewControllerDef
-  }
-  
+
   //  let menus:[Menu] = [
   //    Menu(name:"Counter",vcdef:.counter),
   //    Menu(name:"GitHub Search",vcdef:.gitHubSearch)
   //  ]
 
   let menus = Observable<[Menu]>.just([
-    Menu(name:"Counter",vcdef:.counter),
-    Menu(name:"GitHub Search",vcdef:.gitHubSearch),
-    Menu(name:"RxDatasource Table",vcdef:.rxDatasourceTable)
+    Menu(name: "Counter", vcdef: .counter),
+    Menu(name: "GitHub Search", vcdef: .gitHubSearch),
+    Menu(name: "RxDatasource Table", vcdef: .rxDatasourceTable)
   ])
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view.
-    
-
   }
 
-
   override func viewDidAppear(_ animated: Bool) {
-
     super.viewDidAppear(animated)
 
     if !isBinded {
@@ -77,38 +69,37 @@ class ViewController: UIViewController {
     }
   }
 
-  private func bind(){
-    menus.bind(to:tableView.rx.items(cellIdentifier:"tableViewCell")){   (index,menu,cell) in
+  private func bind() {
+    menus.bind(to: tableView.rx.items(cellIdentifier: "tableViewCell")) { index, menu, cell in
       cell.accessoryType = .disclosureIndicator
       cell.textLabel?.text = "\(index + 1)  \(menu.name)"
     }
     .disposed(by: disposeBag)
 
     tableView.rx.modelSelected(Menu.self)
-      .subscribe(onNext:  {[weak self] menu in
+      .subscribe(onNext: { [weak self] menu in
 
         print("itemSelected \(menu) ")
-        self?.showVC(menu:menu)
+        self?.showVC(menu: menu)
       })
       .disposed(by: disposeBag)
-
   }
 
-  func showVC(menu:Menu){
-      let vc  = menu.vcdef.getVC()
+  func showVC(menu: Menu) {
+    let vc = menu.vcdef.getVC()
 
-      self.navigationController?.pushViewController(vc, animated: true)
-      //    self.present(vc, animated: true, completion: nil)
-    }
+    navigationController?.pushViewController(vc, animated: true)
+    //    self.present(vc, animated: true, completion: nil)
+  }
 }
 
 //
 //
-//extension ViewController:UITableViewDelegate{
+// extension ViewController:UITableViewDelegate{
 //
-//}
+// }
 //
-//extension ViewController:UITableViewDataSource{
+// extension ViewController:UITableViewDataSource{
 //
 //  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //
@@ -135,5 +126,5 @@ class ViewController: UIViewController {
 //
 
 //
-//}
+// }
 //

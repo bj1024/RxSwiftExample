@@ -3,40 +3,34 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-
 protocol GitHubSearchViewModelProtocol {
-  var keyword:BehaviorRelay<String> {get}
-  var results:BehaviorRelay<[String]> {get}
-  var isProcessing:BehaviorRelay<Bool> {get}
-  func setKeyword(kw:String)
+  var keyword: BehaviorRelay<String> { get }
+  var results: BehaviorRelay<[String]> { get }
+  var isProcessing: BehaviorRelay<Bool> { get }
+  func setKeyword(kw: String)
 }
 
-class GitHubSearchViewModel:GitHubSearchViewModelProtocol{
+class GitHubSearchViewModel: GitHubSearchViewModelProtocol {
+  var keyword = BehaviorRelay<String>(value: "")
 
-  
-  var keyword  =  BehaviorRelay<String>(value: "")
-
-  var results = BehaviorRelay<[String]>(value: ["a","b","c"])
-  var isProcessing  =  BehaviorRelay<Bool>(value:false)
-
+  var results = BehaviorRelay<[String]>(value: ["a", "b", "c"])
+  var isProcessing = BehaviorRelay<Bool>(value: false)
 
   private let disposeBag = DisposeBag()
 
-
-  func setKeyword(kw:String){
+  func setKeyword(kw: String) {
     keyword.accept(kw)
 
-
-    print("GitHubSearchViewModel isProcessing = \(self.isProcessing.value)")
+    print("GitHubSearchViewModel isProcessing = \(isProcessing.value)")
     isProcessing.accept(true)
 
     let observableResult = search(keyword: kw)
-    .subscribe(onNext: { [unowned self] repos in
+      .subscribe(onNext: { [unowned self] repos in
 //        print(repos)
-      self.isProcessing.accept(false)
-      self.results.accept(repos)
-    })
-     .disposed(by: disposeBag)
+        self.isProcessing.accept(false)
+        self.results.accept(repos)
+      })
+      .disposed(by: disposeBag)
 //
 //    let cancelRequest = responseJSON
 //        // this will fire the request
@@ -48,40 +42,35 @@ class GitHubSearchViewModel:GitHubSearchViewModelProtocol{
 
     // if you want to cancel request after 3 seconds have passed just call
 //    observableResult.dispose()
-  //    DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + .seconds(3)){
-  //      DispatchQueue.main.async {
-  //          self.isProcessing.accept(false)
-  //        print("GitHubSearchViewModel isProcessing = \(self.isProcessing.value)")
-  //      }
-  //    }
-
-
-}
-
-private func search(keyword:String) -> Observable<[String]>{
-
-  guard let url =  URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {return .just([])}
-  let observableResult:Observable<[String]> = URLSession.shared.rx.json(url: url)
-    .map { json -> ([String]) in
-      guard let dict = json as? [String: Any] else { return [] }
-      guard let items = dict["items"] as? [[String: Any]] else { return [] }
-      let repos = items.compactMap { $0["full_name"] as? String }
-      //              let nextPage = repos.isEmpty ? nil : page + 1
-
-      return repos
+    //    DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + .seconds(3)){
+    //      DispatchQueue.main.async {
+    //          self.isProcessing.accept(false)
+    //        print("GitHubSearchViewModel isProcessing = \(self.isProcessing.value)")
+    //      }
+    //    }
   }
 
-  .do(onError: { error in
-    if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
-      print("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")
-    }
-  })
-    .catchErrorJustReturn([])
+  private func search(keyword: String) -> Observable<[String]> {
+    guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else { return .just([]) }
+    let observableResult: Observable<[String]> = URLSession.shared.rx.json(url: url)
+      .map { json -> ([String]) in
+        guard let dict = json as? [String: Any] else { return [] }
+        guard let items = dict["items"] as? [[String: Any]] else { return [] }
+        let repos = items.compactMap { $0["full_name"] as? String }
+        //              let nextPage = repos.isEmpty ? nil : page + 1
 
-  return observableResult
+        return repos
+      }
 
+      .do(onError: { error in
+        if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
+          print("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")
+        }
+      })
+      .catchErrorJustReturn([])
 
-}
+    return observableResult
+  }
 
 //   private func search(query: String?, page: Int) -> Observable<(repos: [String], nextPage: Int?)> {
 //      let emptyResult: ([String], Int?) = ([], nil)

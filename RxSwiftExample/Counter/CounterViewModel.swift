@@ -1,27 +1,25 @@
 //
-// Copyright (c) 2020, mycompany All rights reserved. 
+// Copyright (c) 2020, mycompany All rights reserved.
 //
 
 import Foundation
 import RxCocoa
 import RxSwift
 
-
 protocol CounterViewModelProtocol {
-  var count:BehaviorRelay<Int> {get}
+  var count: BehaviorRelay<Int> { get }
   func countUp()
   func countDown()
 }
 
-class CounterViewModel:CounterViewModelProtocol{
+class CounterViewModel: CounterViewModelProtocol {
   var count = BehaviorRelay<Int>(value: 0)
 
-  func countUp(){
+  func countUp() {
     count.accept(count.value + 1)
   }
 
-  func countDown(){
+  func countDown() {
     count.accept(count.value - 1)
   }
-
 }
