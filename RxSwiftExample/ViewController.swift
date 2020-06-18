@@ -16,7 +16,7 @@ class ViewController: UIViewController {
   enum ViewControllerDef{
     case counter
     case gitHubSearch
-
+    case rxDatasourceTable
 
 
     func getVC() -> UIViewController{
@@ -31,6 +31,10 @@ class ViewController: UIViewController {
         storyboardName="GitHubSearch"
         id="GitHubSearchViewController"
 
+
+      case .rxDatasourceTable:
+        storyboardName="RxDatasourceTable"
+        id="RxDatasourceTableViewController"
       }
 
       let storyboard = UIStoryboard(name: storyboardName, bundle: nil)
@@ -51,7 +55,8 @@ class ViewController: UIViewController {
 
   let menus = Observable<[Menu]>.just([
     Menu(name:"Counter",vcdef:.counter),
-    Menu(name:"GitHub Search",vcdef:.gitHubSearch)
+    Menu(name:"GitHub Search",vcdef:.gitHubSearch),
+    Menu(name:"RxDatasource Table",vcdef:.rxDatasourceTable)
   ])
   
   override func viewDidLoad() {
