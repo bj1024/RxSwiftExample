@@ -17,6 +17,9 @@ class RxDatasourceTableViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
+
+    buttonReload.setTitle("", for: .normal)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -60,11 +63,6 @@ class RxDatasourceTableViewController: UIViewController {
       .bind(to: tableView.rx.items(dataSource: dataSource))
       .disposed(by: disposeBag)
 
-//
-//    let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Int>>(configureCell: configureCell)
-//    Observable.just([SectionModel(model: "title", items: [1, 2, 3])])
-//        .bind(to: tableView.rx.items(dataSource: dataSource))
-//        .disposed(by: disposeBag)
 
     buttonReload.rx.tap
       .subscribe { [unowned self] _ in
@@ -72,10 +70,6 @@ class RxDatasourceTableViewController: UIViewController {
       }
       .disposed(by: disposeBag)
 
-//    viewModel.runnningTimer
-//      .map{ $0 == nil }
-//      .bind(to: buttonReload.rx.isEnabled)
-//      .disposed(by: disposeBag)
 
     viewModel.runnningTimer
       .map { $0 == nil ? "Start" : "Stop" }

@@ -96,17 +96,4 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
     return String((0..<length).map { _ in letters.randomElement()! })
   }
 
-//
-//  func runTimer(){
-//
-//
-//  }
-//
-//  func stopTimer(){
-//    if let timer = runnningTimer.value {
-//      timer.cancel()
-//      runnningTimer.accept(nil)
-//    }
-//
-//  }
 }
