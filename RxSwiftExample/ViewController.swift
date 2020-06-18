@@ -10,9 +10,14 @@ class ViewController: UIViewController {
   
   @IBOutlet weak var tableView: UITableView!
 
+  private var isBinded:Bool  = false
+  private let disposeBag = DisposeBag()
+
   enum ViewControllerDef{
     case counter
     case gitHubSearch
+
+
 
     func getVC() -> UIViewController{
       var storyboardName:String
@@ -39,62 +44,91 @@ class ViewController: UIViewController {
     var vcdef:ViewControllerDef
   }
   
-  let menus:[Menu] = [
+  //  let menus:[Menu] = [
+  //    Menu(name:"Counter",vcdef:.counter),
+  //    Menu(name:"GitHub Search",vcdef:.gitHubSearch)
+  //  ]
+
+  let menus = Observable<[Menu]>.just([
     Menu(name:"Counter",vcdef:.counter),
     Menu(name:"GitHub Search",vcdef:.gitHubSearch)
-
-  ]
+  ])
   
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view.
     
-    tableView.delegate = self
-    tableView.dataSource = self
-    
-    
+
   }
-  
-  
-}
 
 
+  override func viewDidAppear(_ animated: Bool) {
 
-extension ViewController:UITableViewDelegate{
-  
-}
+    super.viewDidAppear(animated)
 
-extension ViewController:UITableViewDataSource{
-  
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    
-    return menus.count
+    if !isBinded {
+      bind()
+      isBinded = true
+    }
   }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
-    let cell = tableView.dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
-    
-    let menuIdx = indexPath.row
-    cell.accessoryType = .disclosureIndicator
-    cell.textLabel?.text = "\(menuIdx + 1)  \(menus[menuIdx].name)"
-    return cell
+
+  private func bind(){
+    menus.bind(to:tableView.rx.items(cellIdentifier:"tableViewCell")){   (index,menu,cell) in
+      cell.accessoryType = .disclosureIndicator
+      cell.textLabel?.text = "\(index + 1)  \(menu.name)"
+    }
+    .disposed(by: disposeBag)
+
+    tableView.rx.modelSelected(Menu.self)
+      .subscribe(onNext:  {[weak self] menu in
+
+        print("itemSelected \(menu) ")
+        self?.showVC(menu:menu)
+      })
+      .disposed(by: disposeBag)
+
   }
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let menuIdx = indexPath.row
-    showVC(menu:menus[menuIdx])
-  }
-  
-  func numberOfSections(in tableView: UITableView) -> Int {
-    return 1
-  }
-  
+
   func showVC(menu:Menu){
-    let vc  = menu.vcdef.getVC()
+      let vc  = menu.vcdef.getVC()
 
-    self.navigationController?.pushViewController(vc, animated: true)
-    //    self.present(vc, animated: true, completion: nil)
-  }
-  
+      self.navigationController?.pushViewController(vc, animated: true)
+      //    self.present(vc, animated: true, completion: nil)
+    }
 }
 
+//
+//
+//extension ViewController:UITableViewDelegate{
+//
+//}
+//
+//extension ViewController:UITableViewDataSource{
+//
+//  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//
+//    return menus.count
+//  }
+//
+//  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//
+//    let cell = tableView.dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
+//
+//    let menuIdx = indexPath.row
+//    cell.accessoryType = .disclosureIndicator
+//    cell.textLabel?.text = "\(menuIdx + 1)  \(menus[menuIdx].name)"
+//    return cell
+//  }
+//  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//    let menuIdx = indexPath.row
+//    showVC(menu:menus[menuIdx])
+//  }
+//
+//  func numberOfSections(in tableView: UITableView) -> Int {
+//    return 1
+//  }
+//
+
+//
+//}
+//
