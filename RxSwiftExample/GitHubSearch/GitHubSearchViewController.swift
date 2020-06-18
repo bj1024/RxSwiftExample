@@ -12,6 +12,8 @@ import RxSwift
 class GitHubSearchViewController: UIViewController {
 
   private var viewModel:GitHubSearchViewModelProtocol = GitHubSearchViewModel()
+
+  private var isBinded:Bool  = false
   private let disposeBag = DisposeBag()
 
   @IBOutlet var tableView: UITableView!
@@ -32,15 +34,25 @@ class GitHubSearchViewController: UIViewController {
     searchController.searchBar.autocapitalizationType = .none
     navigationItem.searchController = searchController
 
-    // Do any additional setup after loading the view.
-    bind()
+
   }
 
   deinit {
     print("deinit GitHubSearchViewController")
   }
 
-  
+  override func viewDidAppear(_ animated: Bool) {
+     super.viewDidAppear(animated)
+     UIView.setAnimationsEnabled(false)
+     searchController.isActive = true
+     searchController.isActive = false
+     UIView.setAnimationsEnabled(true)
+
+    if !isBinded {
+      bind()
+      isBinded = true
+    }
+  }
   func setViewModel(viewModel:GitHubSearchViewModelProtocol){
     self.viewModel = viewModel
   }
@@ -94,13 +106,6 @@ class GitHubSearchViewController: UIViewController {
 
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-     super.viewDidAppear(animated)
-     UIView.setAnimationsEnabled(false)
-     searchController.isActive = true
-     searchController.isActive = false
-     UIView.setAnimationsEnabled(true)
-   }
 }
 
 //
