@@ -29,16 +29,20 @@ class RxDatasourceTableViewController: UIViewController {
       bind()
       isBinded = true
     }
+    viewModel.toggleRun()
   }
 
   func bind() {
     // RxSwiftCommunity/RxDataSources: UITableView and UICollectionView Data Sources for RxSwift (sections, animated updates, editing ...)
     // https://github.com/RxSwiftCommunity/RxDataSources
 
-    let dataSource = RxTableViewSectionedReloadDataSource<SectionOfCustomData>(
+//    let dataSource = RxTableViewSectionedReloadDataSource<SectionOfCustomData>(
+      let dataSource = RxTableViewSectionedAnimatedDataSource<SectionOfCustomData>(
       configureCell: { _, tableView, indexPath, item in
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = "Item \(item.anInt): \(item.aString) - \(item.aCGPoint.x):\(item.aCGPoint.y)"
+//        cell.textLabel?.text = "Item \(item.anInt): \(item.aString) - \(item.aCGPoint.x):\(item.aCGPoint.y)"
+
+        cell.textLabel?.text = "Item \(String(format:"%3d",item.anInt)) \(item.aString) "
         return cell
       }
     )
