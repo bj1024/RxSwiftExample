@@ -12,6 +12,8 @@ protocol GitHubSearchViewModelProtocol {
 }
 
 class GitHubSearchViewModel:GitHubSearchViewModelProtocol{
+
+  
   var keyword  =  BehaviorRelay<String>(value: "")
 
   var results = BehaviorRelay<[String]>(value: ["a","b","c"])
