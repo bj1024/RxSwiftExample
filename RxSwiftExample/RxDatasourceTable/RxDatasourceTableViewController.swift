@@ -12,7 +12,7 @@ class RxDatasourceTableViewController: UIViewController {
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var buttonReload: UIButton!
 
-
+  private var viewModel:RxDatasourceTableModelProtocol = RxDatasourceTableViewModel()
   private var isBinded:Bool  = false
   private let disposeBag = DisposeBag()
 
@@ -60,12 +60,8 @@ class RxDatasourceTableViewController: UIViewController {
       return true
     }
 
-    let sections = [
-      SectionOfCustomData(header: "First section", items: [CustomData(anInt: 0, aString: "zero", aCGPoint: CGPoint.zero), CustomData(anInt: 1, aString: "one", aCGPoint: CGPoint(x: 1, y: 1)) ]),
-      SectionOfCustomData(header: "Second section", items: [CustomData(anInt: 2, aString: "two", aCGPoint: CGPoint(x: 2, y: 2)), CustomData(anInt: 3, aString: "three", aCGPoint: CGPoint(x: 3, y: 3)) ])
-    ]
 
-    Observable.just(sections)
+    viewModel.sections
       .bind(to: tableView.rx.items(dataSource: dataSource))
       .disposed(by: disposeBag)
     
@@ -76,10 +72,35 @@ class RxDatasourceTableViewController: UIViewController {
 //        .disposed(by: disposeBag)
 
 
+    buttonReload.rx.tap
+    .subscribe { [unowned self] _ in
+      self.viewModel.toggleRun()
+    }
+    .disposed(by: disposeBag)
+
+//    viewModel.runnningTimer
+//      .map{ $0 == nil }
+//      .bind(to: buttonReload.rx.isEnabled)
+//      .disposed(by: disposeBag)
+
+    viewModel.runnningTimer
+      .map{ $0 == nil ? "Start" : "Stop"  }
+      .bind(to: buttonReload.rx.title())
+      .disposed(by: disposeBag)
+
+    viewModel.runnningTimer
+      .map{ $0 == nil ? UIColor.blue : UIColor.red  }
+         .bind(to: buttonReload.rx.backgroundColor)
+         .disposed(by: disposeBag)
+
+
+
   }
   @IBAction func onTapReload(_ sender: Any) {
 
+    
+   
 
   }
-
+  
 }
