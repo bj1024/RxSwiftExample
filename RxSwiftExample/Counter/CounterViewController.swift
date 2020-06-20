@@ -8,7 +8,7 @@ class CounterViewController: UIViewController {
   @IBOutlet weak var btnPlus: UIButton!
   @IBOutlet weak var btnMinus: UIButton!
 
-  private var viewModel: CounterViewModelProtocol = CounterViewModel()
+  private var viewModel = CounterViewModel()
 
   private let disposeBag = DisposeBag()
 
@@ -18,33 +18,26 @@ class CounterViewController: UIViewController {
 
     // Do any additional setup after loading the view.
     //    setViewModel(viewModel: CounterViewModel())
-    bind()
+    bindViewModel()
   }
 
   deinit {
     print("deinit CounterViewController")
   }
 
-  func setViewModel(viewModel: CounterViewModelProtocol) {
-    self.viewModel = viewModel
-  }
 
-  func bind() {
+  func bindViewModel() {
     btnPlus.rx.tap
-      .subscribe(onNext: { [unowned self] _ in
-        self.viewModel.countUp()
-      })
+      .bind(to: viewModel.input.countUp)
       .disposed(by: disposeBag)
 
     btnMinus.rx.tap
-      .subscribe(onNext: { [unowned self] _ in
-        self.viewModel.countDown()
-
-      })
+      .bind(to: viewModel.input.countDown)
       .disposed(by: disposeBag)
 
-    viewModel.count.map { "\($0)" }
-      .bind(to: countLabel.rx.text)
-      .disposed(by: disposeBag)
+    viewModel.output.countLabel
+      .map{"\($0)"}
+      .drive(countLabel.rx.text)
+    .disposed(by: disposeBag)
   }
 }
