@@ -24,6 +24,7 @@
 		20D15837249B77330028DF30 /* RxDatasourceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D15836249B77330028DF30 /* RxDatasourceTableViewController.swift */; };
 		20D15839249B79850028DF30 /* RxDatasourceTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D15838249B79850028DF30 /* RxDatasourceTableViewModel.swift */; };
 		20D1583E249DF7F90028DF30 /* CountCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D1583D249DF7F90028DF30 /* CountCalculator.swift */; };
+		20D15840249F33030028DF30 /* CounterViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D1583F249F33030028DF30 /* CounterViewModelTest.swift */; };
 		333ACFD1C00ED79EE9003B05 /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BEE3AC05A220D9BAB8A825C /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework */; };
 		5B5F3A22D152E3D75016B691 /* Pods_RxSwiftExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 163C85011865502E08EC277C /* Pods_RxSwiftExample.framework */; };
 		984CA6D0DF0209CEDDF821E7 /* Pods_RxSwiftExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E42DB379E8B135F195D6658 /* Pods_RxSwiftExampleTests.framework */; };
@@ -73,6 +74,7 @@
 		20D15836249B77330028DF30 /* RxDatasourceTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxDatasourceTableViewController.swift; sourceTree = "<group>"; };
 		20D15838249B79850028DF30 /* RxDatasourceTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxDatasourceTableViewModel.swift; sourceTree = "<group>"; };
 		20D1583D249DF7F90028DF30 /* CountCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountCalculator.swift; sourceTree = "<group>"; };
+		20D1583F249F33030028DF30 /* CounterViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterViewModelTest.swift; sourceTree = "<group>"; };
 		5BEE3AC05A220D9BAB8A825C /* Pods_RxSwiftExample_RxSwiftExampleUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxSwiftExample_RxSwiftExampleUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E42DB379E8B135F195D6658 /* Pods_RxSwiftExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxSwiftExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B08E569ACC3E00AB042DC1 /* Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig"; path = "Target Support Files/Pods-RxSwiftExample-RxSwiftExampleUITests/Pods-RxSwiftExample-RxSwiftExampleUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				201637672497908E00291257 /* Counter.storyboard */,
 				2016376E24985B5B00291257 /* CounterViewModel.swift */,
 				20D1583D249DF7F90028DF30 /* CountCalculator.swift */,
+				20D1583F249F33030028DF30 /* CounterViewModelTest.swift */,
 			);
 			path = Counter;
 			sourceTree = "<group>";
@@ -478,6 +481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2016374C24978E1E00291257 /* RxSwiftExampleTests.swift in Sources */,
+				20D15840249F33030028DF30 /* CounterViewModelTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
