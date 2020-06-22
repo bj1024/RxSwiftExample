@@ -8,7 +8,10 @@ class CounterViewController: UIViewController {
   @IBOutlet weak var btnPlus: UIButton!
   @IBOutlet weak var btnMinus: UIButton!
 
-  private var viewModel = CounterViewModel()
+  @IBOutlet weak var waitIndicator: UIActivityIndicatorView!
+  private var viewModel = CounterViewModel(
+    dependancy:CounterViewModel.Dependancy(calculator: HeavyCountCalculator())
+  )
 
   private let disposeBag = DisposeBag()
 
@@ -39,5 +42,40 @@ class CounterViewController: UIViewController {
       .map{"\($0)"}
       .drive(countLabel.rx.text)
     .disposed(by: disposeBag)
+
+//    viewModel.output.isProcessing
+//         .map{!$0}
+//         .drive(btnPlus.rx.isEnabled)
+//       .disposed(by: disposeBag)
+//    viewModel.output.isProcessing
+//      .map{!$0}
+//      .drive(btnMinus.rx.isEnabled)
+//    .disposed(by: disposeBag)
+
+    viewModel.output.isProcessing
+    .distinctUntilChanged()
+      .drive(onNext:{ [unowned self] isProcessing in
+
+        if isProcessing{
+          self.waitIndicator.isHidden = false
+          self.waitIndicator.startAnimating()
+          self.btnPlus.isEnabled = false
+          self.btnMinus.isEnabled = false
+
+        }
+        else{
+          self.waitIndicator.isHidden = true
+          self.waitIndicator.stopAnimating()
+          self.btnPlus.isEnabled = true
+          self.btnMinus.isEnabled = true
+        }
+
+
+      })
+    .disposed(by: disposeBag)
+
+
+
+
   }
 }

@@ -170,10 +170,10 @@
 		201637642497900600291257 /* Counter */ = {
 			isa = PBXGroup;
 			children = (
-				201637652497907F00291257 /* CounterViewController.swift */,
 				201637672497908E00291257 /* Counter.storyboard */,
-				2016376E24985B5B00291257 /* CounterViewModel.swift */,
 				20D1583D249DF7F90028DF30 /* CountCalculator.swift */,
+				201637652497907F00291257 /* CounterViewController.swift */,
+				2016376E24985B5B00291257 /* CounterViewModel.swift */,
 				20D1583F249F33030028DF30 /* CounterViewModelTest.swift */,
 			);
 			path = Counter;
