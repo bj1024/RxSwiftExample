@@ -25,9 +25,13 @@ protocol CountCalculator{
 }
 
 class CounterViewModel: ViewModelType {
+
+  private let backgroundScheduler = SerialDispatchQueueScheduler(queue: .global(qos: .default), internalSerialQueueName: "com.myapp.background")
+
+
   var input: Input
   var output: Output
-  var dependancy: Dependancy
+  var dependency: Dependency
 
   // PublishRelay: onNextのみ発生するSubject
   // Subject:Observer、Observableにもなれる。
@@ -59,16 +63,14 @@ class CounterViewModel: ViewModelType {
   // ViewModelが依存する機能 APICallなどを指定する。
   //  Testabilityのために、コンストラクタで指定しViewModel内にハードコーディングしないようにする。
   //
-  struct Dependancy{
+  struct Dependency{
     let calculator:CountCalculator
   }
 
-//  private let countUpSubject = PublishSubject<Void>()
-//  private let countDownSubject = PublishSubject<Void>()
   private let disposeBag = DisposeBag()
 
   //
-  init(dependancy:Dependancy = Dependancy(calculator: SimpleCountCalculator())){
+  init(dependency:Dependency = Dependency(calculator: SimpleCountCalculator())){
 
     // Countの状態を保持する変数。１つの状態を記憶する Subject BehaviorRelayを指定する。
     // BehaviorRelay なので、エラー・Completeは流さない。
@@ -84,10 +86,11 @@ class CounterViewModel: ViewModelType {
 
     countUpRelay
 //      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+      .observeOn( backgroundScheduler)  // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
       .subscribe(onNext: {  _ in
 
         isProcessingSubject.accept(true)
-        dependancy.calculator.countUp(val: countSubject.value){ result in
+        dependency.calculator.countUp(val: countSubject.value){ result in
           switch(result){
           case .success(let newVal):
             countSubject.accept( newVal)
@@ -102,10 +105,11 @@ class CounterViewModel: ViewModelType {
 
     countDownRelay
 //      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+      .observeOn( backgroundScheduler)  // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
       .subscribe(onNext: {_ in
 
         isProcessingSubject.accept(true)
-        dependancy.calculator.countDown(val: countSubject.value){ result in
+        dependency.calculator.countDown(val: countSubject.value){ result in
           switch(result){
           case .success(let newVal):
             countSubject.accept( newVal)
@@ -128,7 +132,7 @@ class CounterViewModel: ViewModelType {
       countDown: countDownRelay
     )
 
-    self.dependancy = dependancy
+    self.dependency = dependency
 
 
   }
