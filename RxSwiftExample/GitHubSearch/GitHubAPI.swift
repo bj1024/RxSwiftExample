@@ -2,21 +2,19 @@
 import Foundation
 import RxCocoa
 import RxSwift
-protocol GitHubAPIProtocol{
-  func search(keyword:String,completion: @escaping (Result<[String],Error>)-> Void)
+protocol GitHubAPIProtocol {
+  func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void)
 }
 
 enum GitHubAPIError: Error {
-    case url(String)
-    case request(String)
+  case url(String)
+  case request(String)
 }
 
-
-class GitHubAPI:GitHubAPIProtocol{
+class GitHubAPI: GitHubAPIProtocol {
   //  let queue = DispatchQueue(label: "com.myapp.GitHubAPI", qos: .utility)
 
   private let disposeBag = DisposeBag()
-
 
   func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void) {
     print("GitHubAPI searching")
@@ -29,13 +27,13 @@ class GitHubAPI:GitHubAPIProtocol{
     }
 
     // make URLRequest
-    let req = URLRequest(url:url)
+    let req = URLRequest(url: url)
 
     let responseJSON = URLSession.shared.rx.json(request: req)
     let cancelRequest = responseJSON
       .subscribe(onNext: { json in
         print(json)
-        completion(.success([json]))
+        completion(.success(["\(json)"]))
     })
 
     let session = URLSession.shared.rx.json(url: url)
@@ -51,40 +49,36 @@ class GitHubAPI:GitHubAPIProtocol{
         //        return (repos, nextPage)
 
         return repos
-    }
-    .subscribe(
-      onNext: { repos in
-        print(repos)
-        completion(.success(repos))
-    },
-      onError: { error in
+      }
+      .subscribe(
+        onNext: { repos in
+          print(repos)
+          completion(.success(repos))
+        },
+        onError: { error in
 
-        if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
-          print("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")
+          if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
+            print("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")
 
-          completion(.failure(GitHubAPIError.request("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")))
-        }
-        else{
+            completion(.failure(GitHubAPIError.request("⚠️ GitHub API rate limit exceeded. Wait for 60 seconds and try again.")))
+          }
+          else {
             completion(.failure(GitHubAPIError.request("request error ")))
+          }
         }
-    })
-.disposed(by: disposeBag)
-
+      )
+      .disposed(by: disposeBag)
   }
 }
 
-
-
-class GitHubAPIDummy:GitHubAPIProtocol{
-
+class GitHubAPIDummy: GitHubAPIProtocol {
   func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void) {
     print("GitHubAPI searching")
     Thread.sleep(forTimeInterval: 3.0)
-    var newValue:[String] = ["keyword is [\(keyword)]"]
+    var newValue: [String] = ["keyword is [\(keyword)]"]
     newValue.append(contentsOf:
       "🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳".map { String($0) }
     )
     completion(.success(newValue))
   }
 }
-
