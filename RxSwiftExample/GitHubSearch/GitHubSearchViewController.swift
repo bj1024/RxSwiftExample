@@ -8,7 +8,7 @@ import RxCocoa
 import RxSwift
 
 class GitHubSearchViewController: UIViewController {
-  private var viewModel: GitHubSearchViewModelProtocol = GitHubSearchViewModel()
+  private var viewModel = GitHubSearchViewModel()
 
   private var isBinded: Bool = false
   private let disposeBag = DisposeBag()
@@ -43,28 +43,26 @@ class GitHubSearchViewController: UIViewController {
     UIView.setAnimationsEnabled(true)
 
     if !isBinded {
-      bind()
+      bindViewModel()
       isBinded = true
     }
   }
 
-  func setViewModel(viewModel: GitHubSearchViewModelProtocol) {
-    self.viewModel = viewModel
-  }
 
-  func bind() {
+  func bindViewModel() {
     // Action
 
     // orEmpty
-    let searchTextObservable = searchController.searchBar.rx.text.orEmpty.asObservable()
+//    let searchTextObservable = searchController.searchBar.rx.text.orEmpty.asObservable()
 
-    searchTextObservable
-      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-      .subscribe(onNext: { [unowned self] event in
-        print("tap event: \(event)")
-        self.viewModel.setKeyword(kw: event)
-      })
+//    searchTextObservable
+//      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+//      .subscribe(onNext: { [unowned self] event in
+//        print("tap event: \(event)")
+//        self.viewModel.setKeyword(kw: event)
+//      })
 
+    searchController.searchBar.rx.text.orEmpty.bind(to:viewModel.input.keyword)
       .disposed(by: disposeBag)
 //
 //    viewModel.keyword
@@ -73,15 +71,14 @@ class GitHubSearchViewController: UIViewController {
 //    }
 //    .disposed(by: disposeBag)
 
-    viewModel.results
-      .bind(to: tableView.rx.items(cellIdentifier: "cell")) { _, repo, cell in
+    viewModel.output.results
+      .drive(tableView.rx.items(cellIdentifier: "cell")) { _, repo, cell in
         cell.textLabel?.text = repo
       }
       .disposed(by: disposeBag)
 
-    viewModel.isProcessing
-      .observeOn(MainScheduler.instance)
-      .subscribe(onNext: { [unowned self] val in
+    viewModel.output.isProcessing
+      .drive(onNext: { [unowned self] val in
         self.activityIndicator.isHidden = !val
         if val {
           self.activityIndicator.startAnimating()

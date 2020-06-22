@@ -3,52 +3,114 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-protocol GitHubSearchViewModelProtocol {
-  var keyword: BehaviorRelay<String> { get }
-  var results: BehaviorRelay<[String]> { get }
-  var isProcessing: BehaviorRelay<Bool> { get }
-  func setKeyword(kw: String)
-}
 
-class GitHubSearchViewModel: GitHubSearchViewModelProtocol {
-  var keyword = BehaviorRelay<String>(value: "")
 
-  var results = BehaviorRelay<[String]>(value: ["a", "b", "c"])
-  var isProcessing = BehaviorRelay<Bool>(value: false)
+class GitHubSearchViewModel: ViewModelType {
+
+  private let backgroundScheduler = SerialDispatchQueueScheduler(queue: .global(qos: .default), internalSerialQueueName: "com.myapp.background")
+
+
+
+  struct Input{
+    let keyword:PublishRelay<String>
+  }
+
+  struct Output{
+    let results:Driver<[String]>
+    let isProcessing:Driver<Bool>
+  }
+
+  struct Dependency{
+    let apiGitHub:GitHubAPIProtocol
+  }
+
+  var input: Input
+  var output: Output
+  var dependency: Dependency
 
   private let disposeBag = DisposeBag()
 
-  func setKeyword(kw: String) {
-    keyword.accept(kw)
+  init(dependency:Dependency = Dependency(apiGitHub: GitHubAPI())){
 
-    print("GitHubSearchViewModel isProcessing = \(isProcessing.value)")
-    isProcessing.accept(true)
+    let keyword = PublishRelay<String>()
+    let results = PublishRelay<[String]>()
+    let isProcessingSubject = BehaviorRelay<Bool>(value:false)
 
-    let observableResult = search(keyword: kw)
-      .subscribe(onNext: { [unowned self] repos in
-//        print(repos)
-        self.isProcessing.accept(false)
-        self.results.accept(repos)
+    keyword
+      .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
+      .filter{ ($0.isEmpty || $0.count > 2) }
+      .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
+      .subscribe(onNext: { str  in
+
+        if str.isEmpty {
+          results.accept([])
+          return
+        }
+
+        isProcessingSubject.accept(true)
+        dependency.apiGitHub.search(keyword: str){ result in
+          switch(result){
+          case .success(let newVal):
+            results.accept(newVal )
+          case .failure(let error):
+            print(error)
+          }
+          isProcessingSubject.accept(false)
+        }
       })
       .disposed(by: disposeBag)
-//
-//    let cancelRequest = responseJSON
-//        // this will fire the request
-//        .subscribe(onNext: { json in
-//            print(json)
-//        })
 
-//    Thread.sleep(forTimeInterval: 3.0)
+    self.output = Output(
+      results: results.asDriver(onErrorJustReturn: []),
+      isProcessing: isProcessingSubject.asDriver()
+    )
 
-    // if you want to cancel request after 3 seconds have passed just call
-//    observableResult.dispose()
-    //    DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + .seconds(3)){
-    //      DispatchQueue.main.async {
-    //          self.isProcessing.accept(false)
-    //        print("GitHubSearchViewModel isProcessing = \(self.isProcessing.value)")
-    //      }
-    //    }
+    self.input = Input(
+      keyword: keyword
+    )
+
+
+
+    self.dependency = dependency
   }
+
+//  var keyword = BehaviorRelay<String>(value: "")
+//  var results = BehaviorRelay<[String]>(value: ["a", "b", "c"])
+//  var isProcessing = BehaviorRelay<Bool>(value: false)
+
+//
+//
+//  func setKeyword(kw: String) {
+//    keyword.accept(kw)
+//
+//    print("GitHubSearchViewModel isProcessing = \(isProcessing.value)")
+//    isProcessing.accept(true)
+//
+//    let observableResult = search(keyword: kw)
+//      .subscribe(onNext: { [unowned self] repos in
+////        print(repos)
+//        self.isProcessing.accept(false)
+//        self.results.accept(repos)
+//      })
+//      .disposed(by: disposeBag)
+////
+////    let cancelRequest = responseJSON
+////        // this will fire the request
+////        .subscribe(onNext: { json in
+////            print(json)
+////        })
+//
+////    Thread.sleep(forTimeInterval: 3.0)
+//
+//    // if you want to cancel request after 3 seconds have passed just call
+////    observableResult.dispose()
+//    //    DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + .seconds(3)){
+//    //      DispatchQueue.main.async {
+//    //          self.isProcessing.accept(false)
+//    //        print("GitHubSearchViewModel isProcessing = \(self.isProcessing.value)")
+//    //      }
+//    //    }
+//  }
 
   private func search(keyword: String) -> Observable<[String]> {
     guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else { return .just([]) }
@@ -92,3 +154,5 @@ class GitHubSearchViewModel: GitHubSearchViewModelProtocol {
 //    }
 //  }
 }
+
+
