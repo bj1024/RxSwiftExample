@@ -20,6 +20,7 @@
 		2016376D2498455600291257 /* GitHubSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016376C2498455600291257 /* GitHubSearchViewController.swift */; };
 		2016376F24985B5B00291257 /* CounterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016376E24985B5B00291257 /* CounterViewModel.swift */; };
 		2016377124985CBE00291257 /* GitHubSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016377024985CBE00291257 /* GitHubSearchViewModel.swift */; };
+		20CBDD4024A0A6DB00704C16 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CBDD3F24A0A6DB00704C16 /* ViewModelType.swift */; };
 		20D15835249B77200028DF30 /* RxDatasourceTable.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20D15834249B77200028DF30 /* RxDatasourceTable.storyboard */; };
 		20D15837249B77330028DF30 /* RxDatasourceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D15836249B77330028DF30 /* RxDatasourceTableViewController.swift */; };
 		20D15839249B79850028DF30 /* RxDatasourceTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D15838249B79850028DF30 /* RxDatasourceTableViewModel.swift */; };
@@ -70,6 +71,7 @@
 		2016376C2498455600291257 /* GitHubSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSearchViewController.swift; sourceTree = "<group>"; };
 		2016376E24985B5B00291257 /* CounterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterViewModel.swift; sourceTree = "<group>"; };
 		2016377024985CBE00291257 /* GitHubSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSearchViewModel.swift; sourceTree = "<group>"; };
+		20CBDD3F24A0A6DB00704C16 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		20D15834249B77200028DF30 /* RxDatasourceTable.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = RxDatasourceTable.storyboard; sourceTree = "<group>"; };
 		20D15836249B77330028DF30 /* RxDatasourceTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxDatasourceTableViewController.swift; sourceTree = "<group>"; };
 		20D15838249B79850028DF30 /* RxDatasourceTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxDatasourceTableViewModel.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 		2016373324978E1D00291257 /* RxSwiftExample */ = {
 			isa = PBXGroup;
 			children = (
+				20CBDD3E24A0A6C600704C16 /* Common */,
 				20D15833249B77060028DF30 /* RxDatasourceTable */,
 				20163769249843E800291257 /* GitHubSearch */,
 				201637642497900600291257 /* Counter */,
@@ -187,6 +190,14 @@
 				2016377024985CBE00291257 /* GitHubSearchViewModel.swift */,
 			);
 			path = GitHubSearch;
+			sourceTree = "<group>";
+		};
+		20CBDD3E24A0A6C600704C16 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				20CBDD3F24A0A6DB00704C16 /* ViewModelType.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		20D15833249B77060028DF30 /* RxDatasourceTable */ = {
@@ -472,6 +483,7 @@
 				20D1583E249DF7F90028DF30 /* CountCalculator.swift in Sources */,
 				20D15839249B79850028DF30 /* RxDatasourceTableViewModel.swift in Sources */,
 				2016373524978E1D00291257 /* AppDelegate.swift in Sources */,
+				20CBDD4024A0A6DB00704C16 /* ViewModelType.swift in Sources */,
 				2016376F24985B5B00291257 /* CounterViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
