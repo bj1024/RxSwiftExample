@@ -10,7 +10,7 @@ class CounterViewController: UIViewController {
 
   @IBOutlet weak var waitIndicator: UIActivityIndicatorView!
   private var viewModel = CounterViewModel(
-    dependancy:CounterViewModel.Dependancy(calculator: HeavyCountCalculator())
+    dependency:CounterViewModel.Dependency(calculator: HeavyCountCalculator())
   )
 
   private let disposeBag = DisposeBag()
