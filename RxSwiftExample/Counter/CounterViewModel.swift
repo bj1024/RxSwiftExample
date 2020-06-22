@@ -34,9 +34,16 @@ protocol ViewModelType {
 
 // CounterViewModelでの カウント処理のprotocol
 // MVVM参考実装として、カウント処理を外部依存として実装してみる。
+// カウント処理はなぜかとても時間のかかる処理としてみる。
+//
+// カウント処理終了を待つ方法としては、
+// closure
+// delegate
+// observable
+// など多数があるが、あまり難解にならないように、closureにする
 protocol CountCalculator{
-  func countUp(val:Int)->Int
-  func countDown(val:Int)->Int
+  func countUp(val:Int,completion: @escaping (Result<Int,Error>)-> Void)
+  func countDown(val:Int,completion: @escaping (Result<Int,Error>)-> Void)
 }
 
 class CounterViewModel: ViewModelType {
@@ -68,6 +75,7 @@ class CounterViewModel: ViewModelType {
   //  Share= 1つのObservableを共有する。 （2つ以上Subscribeされても、1つのObservableのOnNextを流す。）
   struct Output{
     let countLabel:Driver<Int>
+    let isProcessing:Driver<Bool>
   }
 
   // ViewModelが依存する機能 APICallなどを指定する。
@@ -89,32 +97,57 @@ class CounterViewModel: ViewModelType {
     // Subjectのため、外部から値を変更でき、Observerに値を流すことができる。
     // OutputにはこのSubjectをDriver化してセットする。
     let countSubject = BehaviorRelay<Int>(value: 0)
+    let isProcessingSubject = BehaviorRelay<Bool>(value:false)
 
     // Input 用のPublishRelay。Subscribeして、イベントを捉える。
     let countUpRelay = PublishRelay<Void>() // InputがPublishRelayの場合
-//    let countUpRelay = PublishSubject<Void>() // InputがAnyObserverの場合
-    countUpRelay.subscribe(onNext: {  _ in
-      let newVal = dependancy.calculator.countUp(val: countSubject.value)
-      countSubject.accept( newVal)
-    })
-    .disposed(by: disposeBag)
+    let countDownRelay = PublishRelay<Void>()
 
-    
-    let countDownSubject = PublishRelay<Void>()
-//    let countDownSubject = PublishSubject<Void>()
 
-    countDownSubject.subscribe(onNext: {_ in
-      let newVal = dependancy.calculator.countDown(val: countSubject.value)
-      countSubject.accept(newVal)
-    })
+    countUpRelay
+//      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+      .subscribe(onNext: {  _ in
+
+        isProcessingSubject.accept(true)
+        dependancy.calculator.countUp(val: countSubject.value){ result in
+          switch(result){
+          case .success(let newVal):
+            countSubject.accept( newVal)
+          case .failure(let error):
+            print(error)
+          }
+          isProcessingSubject.accept(false)
+        }
+      })
       .disposed(by: disposeBag)
 
 
-    self.output = Output(countLabel: countSubject.asDriver())
+    countDownRelay
+//      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+      .subscribe(onNext: {_ in
+
+        isProcessingSubject.accept(true)
+        dependancy.calculator.countDown(val: countSubject.value){ result in
+          switch(result){
+          case .success(let newVal):
+            countSubject.accept( newVal)
+          case .failure(let error):
+            print(error)
+          }
+          isProcessingSubject.accept(false)
+        }
+      })
+      .disposed(by: disposeBag)
+//
+
+    self.output = Output(
+      countLabel: countSubject.asDriver(),
+      isProcessing: isProcessingSubject.asDriver()
+    )
 
     self.input = Input(
       countUp: countUpRelay,
-      countDown: countDownSubject
+      countDown: countDownRelay
     )
 
     self.dependancy = dependancy
