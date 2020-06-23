@@ -8,7 +8,7 @@ import RxCocoa
 import RxDataSources
 import RxSwift
 
-struct CustomData:IdentifiableType ,Equatable{
+struct CustomData: IdentifiableType, Equatable {
   typealias Identity = Int
 
   var anInt: Int
@@ -16,9 +16,8 @@ struct CustomData:IdentifiableType ,Equatable{
   var aCGPoint: CGPoint
 
   var identity: Int {
-         return anInt
-     }
-
+    return anInt
+  }
 }
 
 struct SectionOfCustomData {
@@ -33,6 +32,7 @@ extension SectionOfCustomData: AnimatableSectionModelType {
     self = original
     self.items = items
   }
+
   var identity: String {
     // headerをSectionのIDとする。Headerを変更するとSectionがすり替わる。
     return header
@@ -55,13 +55,14 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
   let sectionTitle = ["items"]
   let characters = Array("🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳")
 
-  enum RunStep{
+  enum RunStep {
     case create
     case sort
     case insert
     case delete
   }
-  private var step:RunStep = .create
+
+  private var step: RunStep = .create
 
   var sections = BehaviorRelay<[SectionOfCustomData]>(value:
     [
@@ -84,8 +85,7 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
       timer.schedule(deadline: .now(), repeating: 1.0)
 
       timer.setEventHandler { [weak self] in
-        guard let self = self else{ return }
-
+        guard let self = self else { return }
 
         print(Date())
         self.stepData()
@@ -95,8 +95,8 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
     }
   }
 
-  private func stepData(){
-    switch ( step ){
+  private func stepData() {
+    switch step {
     case .create:
       createData()
       step = .sort
@@ -113,11 +113,11 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
   }
 
   private func createData() {
-    let num = Int.random(in: 1..<30)
+    let num = Int.random(in: 1 ..< 30)
     print("num=\(num)")
 
     var newItems: [CustomData] = []
-    for i in 0..<num {
+    for i in 0 ..< num {
 //      print("i=\(i)")
       newItems.append(
         createItem(idx: i)
@@ -133,8 +133,8 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
 
     status.accept("create \(num) items")
   }
-  private func sortData() {
 
+  private func sortData() {
     var newItems = sections.value[0].items
 
     newItems.shuffle()
@@ -145,16 +145,15 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
       ]
     )
     status.accept("sort items")
-
   }
 
   private func insertData() {
     var newItems = sections.value[0].items
 
-    let insNum = min(Int.random(in: 1...newItems.count),100)
+    let insNum = min(Int.random(in: 1 ... newItems.count), 100)
 
-    for _ in 0..<insNum{
-      let insIdx = Int.random(in: 0..<newItems.count)
+    for _ in 0 ..< insNum {
+      let insIdx = Int.random(in: 0 ..< newItems.count)
       let newItem = createItem(idx: newItems.count + 1)
       newItems.insert(newItem, at: insIdx)
     }
@@ -171,10 +170,10 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
   private func deleteData() {
     var newItems = sections.value[0].items
 
-    let delNum = min(Int.random(in: 1...newItems.count),100)
+    let delNum = min(Int.random(in: 1 ... newItems.count), 100)
 
-    for _ in 0..<delNum{
-      let delidx = Int.random(in: 0..<newItems.count)
+    for _ in 0 ..< delNum {
+      let delidx = Int.random(in: 0 ..< newItems.count)
       newItems.remove(at: delidx)
     }
 
@@ -187,23 +186,17 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
     status.accept("remove \(delNum) items")
   }
 
-  private func createItem(idx:Int) -> CustomData{
-
-
-
+  private func createItem(idx: Int) -> CustomData {
     let str = String(characters[idx % characters.count])
-   return CustomData(
+    return CustomData(
       anInt: idx,
-      aString:  str,
+      aString: str,
       aCGPoint: CGPoint(x: idx, y: idx)
     )
-
   }
-
 
   func randomString(length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    return String((0..<length).map { _ in letters.randomElement()! })
+    return String((0 ..< length).map { _ in letters.randomElement()! })
   }
-
 }

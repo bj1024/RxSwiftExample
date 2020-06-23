@@ -48,7 +48,6 @@ class GitHubSearchViewController: UIViewController {
     }
   }
 
-
   func bindViewModel() {
     // Action
 
@@ -62,7 +61,7 @@ class GitHubSearchViewController: UIViewController {
 //        self.viewModel.setKeyword(kw: event)
 //      })
 
-    searchController.searchBar.rx.text.orEmpty.bind(to:viewModel.input.keyword)
+    searchController.searchBar.rx.text.orEmpty.bind(to: viewModel.input.keyword)
       .disposed(by: disposeBag)
 //
 //    viewModel.keyword

@@ -3,8 +3,7 @@
 import Foundation
 import RxSwift
 
-class SimpleCountCalculator:CountCalculator{
-
+class SimpleCountCalculator: CountCalculator {
   func countUp(val: Int, completion: @escaping (Result<Int, Error>) -> Void) {
     Thread.sleep(forTimeInterval: 0)
 
@@ -21,9 +20,7 @@ class SimpleCountCalculator:CountCalculator{
   }
 }
 
-
-
-//class ThouthandCountCalculator:CountCalculator{
+// class ThouthandCountCalculator:CountCalculator{
 //  func countUp(val: Int) -> Int {
 //   let newValue = val + 1000
 //    print("countUp \(val) -> \(newValue)")
@@ -35,11 +32,11 @@ class SimpleCountCalculator:CountCalculator{
 //    print("countDown \(val) -> \(newValue)")
 //    return newValue
 //  }
-//}
+// }
 //
 
 // なんと計算に3秒もかかるCalculator
-class HeavyCountCalculator:CountCalculator{
+class HeavyCountCalculator: CountCalculator {
   let queue = DispatchQueue(label: "com.myapp.countcalculator", qos: .utility)
 
   func countUp(val: Int, completion: @escaping (Result<Int, Error>) -> Void) {
@@ -47,7 +44,6 @@ class HeavyCountCalculator:CountCalculator{
     let newValue = val + 1
     print("countUp \(val) -> \(newValue)")
     completion(.success(newValue))
-
   }
 
   func countDown(val: Int, completion: @escaping (Result<Int, Error>) -> Void) {
@@ -55,6 +51,5 @@ class HeavyCountCalculator:CountCalculator{
     let newValue = val - 1
     print("countDown \(val) -> \(newValue)")
     completion(.success(newValue))
-
   }
 }

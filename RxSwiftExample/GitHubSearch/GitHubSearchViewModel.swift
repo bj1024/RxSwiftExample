@@ -3,25 +3,20 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-
-
 class GitHubSearchViewModel: ViewModelType {
-
   private let backgroundScheduler = SerialDispatchQueueScheduler(queue: .global(qos: .default), internalSerialQueueName: "com.myapp.background")
 
-
-
-  struct Input{
-    let keyword:PublishRelay<String>
+  struct Input {
+    let keyword: PublishRelay<String>
   }
 
-  struct Output{
-    let results:Driver<[String]>
-    let isProcessing:Driver<Bool>
+  struct Output {
+    let results: Driver<[String]>
+    let isProcessing: Driver<Bool>
   }
 
-  struct Dependency{
-    let apiGitHub:GitHubAPIProtocol
+  struct Dependency {
+    let apiGitHub: GitHubAPIProtocol
   }
 
   var input: Input
@@ -30,17 +25,16 @@ class GitHubSearchViewModel: ViewModelType {
 
   private let disposeBag = DisposeBag()
 
-  init(dependency:Dependency = Dependency(apiGitHub: GitHubAPI())){
-
+  init(dependency: Dependency = Dependency(apiGitHub: GitHubAPI())) {
     let keyword = PublishRelay<String>()
     let results = PublishRelay<[String]>()
-    let isProcessingSubject = BehaviorRelay<Bool>(value:false)
+    let isProcessingSubject = BehaviorRelay<Bool>(value: false)
 
     keyword
       .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
-      .filter{ ($0.isEmpty || $0.count > 2) }
+      .filter { ($0.isEmpty || $0.count > 2) }
       .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
-      .subscribe(onNext: { str  in
+      .subscribe(onNext: { str in
 
         if str.isEmpty {
           results.accept([])
@@ -48,11 +42,11 @@ class GitHubSearchViewModel: ViewModelType {
         }
 
         isProcessingSubject.accept(true)
-        dependency.apiGitHub.search(keyword: str){ result in
-          switch(result){
-          case .success(let newVal):
+        dependency.apiGitHub.search(keyword: str) { result in
+          switch result {
+          case let .success(newVal):
             results.accept(newVal )
-          case .failure(let error):
+          case let .failure(error):
             print(error)
           }
           isProcessingSubject.accept(false)
@@ -60,16 +54,14 @@ class GitHubSearchViewModel: ViewModelType {
       })
       .disposed(by: disposeBag)
 
-    self.output = Output(
+    output = Output(
       results: results.asDriver(onErrorJustReturn: []),
       isProcessing: isProcessingSubject.asDriver()
     )
 
-    self.input = Input(
+    input = Input(
       keyword: keyword
     )
-
-
 
     self.dependency = dependency
   }
@@ -88,22 +80,22 @@ class GitHubSearchViewModel: ViewModelType {
 //
 //    let observableResult = search(keyword: kw)
 //      .subscribe(onNext: { [unowned self] repos in
-////        print(repos)
+  ////        print(repos)
 //        self.isProcessing.accept(false)
 //        self.results.accept(repos)
 //      })
 //      .disposed(by: disposeBag)
-////
-////    let cancelRequest = responseJSON
-////        // this will fire the request
-////        .subscribe(onNext: { json in
-////            print(json)
-////        })
+  ////
+  ////    let cancelRequest = responseJSON
+  ////        // this will fire the request
+  ////        .subscribe(onNext: { json in
+  ////            print(json)
+  ////        })
 //
-////    Thread.sleep(forTimeInterval: 3.0)
+  ////    Thread.sleep(forTimeInterval: 3.0)
 //
 //    // if you want to cancel request after 3 seconds have passed just call
-////    observableResult.dispose()
+  ////    observableResult.dispose()
 //    //    DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + .seconds(3)){
 //    //      DispatchQueue.main.async {
 //    //          self.isProcessing.accept(false)
@@ -154,5 +146,3 @@ class GitHubSearchViewModel: ViewModelType {
 //    }
 //  }
 }
-
-

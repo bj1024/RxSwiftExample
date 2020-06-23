@@ -10,7 +10,7 @@ class CounterViewController: UIViewController {
 
   @IBOutlet weak var waitIndicator: UIActivityIndicatorView!
   private var viewModel = CounterViewModel(
-    dependency:CounterViewModel.Dependency(calculator: HeavyCountCalculator())
+    dependency: CounterViewModel.Dependency(calculator: HeavyCountCalculator())
   )
 
   private let disposeBag = DisposeBag()
@@ -28,7 +28,6 @@ class CounterViewController: UIViewController {
     print("deinit CounterViewController")
   }
 
-
   func bindViewModel() {
     btnPlus.rx.tap
       .bind(to: viewModel.input.countUp)
@@ -39,9 +38,9 @@ class CounterViewController: UIViewController {
       .disposed(by: disposeBag)
 
     viewModel.output.countLabel
-      .map{"\($0)"}
+      .map { "\($0)" }
       .drive(countLabel.rx.text)
-    .disposed(by: disposeBag)
+      .disposed(by: disposeBag)
 
 //    viewModel.output.isProcessing
 //         .map{!$0}
@@ -53,29 +52,23 @@ class CounterViewController: UIViewController {
 //    .disposed(by: disposeBag)
 
     viewModel.output.isProcessing
-    .distinctUntilChanged()
-      .drive(onNext:{ [unowned self] isProcessing in
+      .distinctUntilChanged()
+      .drive(onNext: { [unowned self] isProcessing in
 
-        if isProcessing{
+        if isProcessing {
           self.waitIndicator.isHidden = false
           self.waitIndicator.startAnimating()
           self.btnPlus.isEnabled = false
           self.btnMinus.isEnabled = false
-
         }
-        else{
+        else {
           self.waitIndicator.isHidden = true
           self.waitIndicator.stopAnimating()
           self.btnPlus.isEnabled = true
           self.btnMinus.isEnabled = true
         }
 
-
       })
-    .disposed(by: disposeBag)
-
-
-
-
+      .disposed(by: disposeBag)
   }
 }

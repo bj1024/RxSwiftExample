@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020, mycompany All rights reserved. 
+// Copyright (c) 2020, mycompany All rights reserved.
 //
 
 import XCTest
@@ -7,25 +7,21 @@ import XCTest
 import RxCocoa
 import RxSwift
 
-
 @testable import RxSwiftExample
 
+class CountCalculatorMock: CountCalculator {
+  var countUpCalledCount: Int = 0
+  var countDownCalledCount: Int = 0
 
-class CountCalculatorMock:CountCalculator{
+  var isMainThread: Bool = false // MainThreadでCallされた場合にTrue
 
-  var countUpCalledCount:Int = 0
-  var countDownCalledCount:Int = 0
+  let calculator: CountCalculator // 処理を委譲するプロトコル。
 
-  var isMainThread:Bool = false // MainThreadでCallされた場合にTrue
-
-  let calculator:CountCalculator  // 処理を委譲するプロトコル。
-
-  init(calculator:CountCalculator) {
+  init(calculator: CountCalculator) {
     self.calculator = calculator
   }
 
   func countUp(val: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-
     isMainThread = Thread.isMainThread
     countUpCalledCount += 1
     calculator.countUp(val: val, completion: completion)
@@ -40,7 +36,6 @@ class CountCalculatorMock:CountCalculator{
 }
 
 class CounterViewModelTest: XCTestCase {
-
   private let disposeBag = DisposeBag()
 
   override func setUpWithError() throws {
@@ -52,10 +47,8 @@ class CounterViewModelTest: XCTestCase {
   }
 
   func testCreateCounterViewModel() throws {
-
     let vm = CounterViewModel()
     XCTAssertNotNil(vm)
-
   }
 
   func testCountUp() throws {
@@ -64,21 +57,21 @@ class CounterViewModelTest: XCTestCase {
     let vm = CounterViewModel()
 
     // 0 → 1 → 2 → 3をチェック
-    var cnt:Int  = 0
+    var cnt: Int = 0
     vm.output.countLabel.drive(onNext: { v in
       //      print("[\(cnt+1)]times [\(v)]")
-      XCTAssertEqual(v,cnt)
+      XCTAssertEqual(v, cnt)
       cnt += 1
 
     })
       .disposed(by: disposeBag)
     vm.output.countLabel.asObservable()
       .elementAt(3)
-      .subscribe(onNext: { v in
-      expectation.fulfill()
+      .subscribe(onNext: { _ in
+        expectation.fulfill()
     }).disposed(by: disposeBag)
     // 3回イベントEmit
-    let event  = Observable<Void>.from([(),(),()])
+    let event = Observable<Void>.from([(), (), ()])
     event.bind(to: vm.input.countUp)
       .disposed(by: disposeBag)
 
@@ -88,30 +81,29 @@ class CounterViewModelTest: XCTestCase {
   func testCountUpCalled() throws {
     let expectation = XCTestExpectation(description: "Test")
 
-    let calculatorMock =  CountCalculatorMock(
-      calculator:SimpleCountCalculator()
+    let calculatorMock = CountCalculatorMock(
+      calculator: SimpleCountCalculator()
     )
 
     let vm = CounterViewModel(
-      dependency: CounterViewModel.Dependency(calculator:calculatorMock )
+      dependency: CounterViewModel.Dependency(calculator: calculatorMock )
     )
 
     vm.output.countLabel.asObservable()
       .elementAt(3)
-    .subscribe(onNext:{ val in
-      print("val=\(val)")
-      XCTAssertEqual(val, 3)
-      XCTAssertEqual(calculatorMock.countUpCalledCount,3) // ３回分発生するはず
-      XCTAssertEqual(calculatorMock.countDownCalledCount,0) // CountDownがCallされないこともチェック
-      XCTAssertFalse(calculatorMock.isMainThread, "run on background thread")
-      XCTAssertTrue(Thread.isMainThread, "run on Main thread")// Output MainThreadのチェック
+      .subscribe(onNext: { val in
+        print("val=\(val)")
+        XCTAssertEqual(val, 3)
+        XCTAssertEqual(calculatorMock.countUpCalledCount, 3) // ３回分発生するはず
+        XCTAssertEqual(calculatorMock.countDownCalledCount, 0) // CountDownがCallされないこともチェック
+        XCTAssertFalse(calculatorMock.isMainThread, "run on background thread")
+        XCTAssertTrue(Thread.isMainThread, "run on Main thread") // Output MainThreadのチェック
 
-      expectation.fulfill()
+        expectation.fulfill()
     })
-    .disposed(by: disposeBag)
+      .disposed(by: disposeBag)
 
-
-    let event  = Observable<Void>.from([(),(),()])
+    let event = Observable<Void>.from([(), (), ()])
     event.bind(to: vm.input.countUp)
       .disposed(by: disposeBag)
 
@@ -123,62 +115,58 @@ class CounterViewModelTest: XCTestCase {
 
     let vm = CounterViewModel()
 
-    var cnt:Int  = 0
+    var cnt: Int = 0
     vm.output.countLabel.drive(onNext: { v in
       print("drive [\(v)]")
-      XCTAssertEqual(v,cnt)
+      XCTAssertEqual(v, cnt)
       cnt -= 1
     })
       .disposed(by: disposeBag)
 
     vm.output.countLabel.asObservable()
       .elementAt(3)
-      .subscribe(onNext: { v in
-      expectation.fulfill()
+      .subscribe(onNext: { _ in
+        expectation.fulfill()
     })
-   .disposed(by: disposeBag)
+      .disposed(by: disposeBag)
 
-    let event  = Observable<Void>.from([(),(),()])
+    let event = Observable<Void>.from([(), (), ()])
     event.bind(to: vm.input.countDown)
       .disposed(by: disposeBag)
 
     wait(for: [expectation], timeout: 5.0)
-
   }
 
   func testCountDownCalled() throws {
     let expectation = XCTestExpectation(description: "Test")
 
-    let calculatorMock =  CountCalculatorMock(
-      calculator:SimpleCountCalculator()
+    let calculatorMock = CountCalculatorMock(
+      calculator: SimpleCountCalculator()
     )
 
     let vm = CounterViewModel(
-      dependency: CounterViewModel.Dependency(calculator:calculatorMock )
+      dependency: CounterViewModel.Dependency(calculator: calculatorMock )
     )
 
-    let event  = Observable<Void>.from([(),(),()])
+    let event = Observable<Void>.from([(), (), ()])
 
     vm.output.countLabel.asObservable()
       .elementAt(3)
-      .subscribe(onNext:{ val in
+      .subscribe(onNext: { val in
         print("val=\(val)")
         XCTAssertEqual(val, 3)
-        XCTAssertEqual(calculatorMock.countUpCalledCount,0)
-        XCTAssertEqual(calculatorMock.countDownCalledCount,3)
+        XCTAssertEqual(calculatorMock.countUpCalledCount, 0)
+        XCTAssertEqual(calculatorMock.countDownCalledCount, 3)
         XCTAssertFalse(calculatorMock.isMainThread, "run on background thread")
         XCTAssertTrue(Thread.isMainThread, "run on Main thread")
-         expectation.fulfill()
+        expectation.fulfill()
       })
       .disposed(by: disposeBag)
-
 
     event.bind(to: vm.input.countDown)
       .disposed(by: disposeBag)
 
-
     wait(for: [expectation], timeout: 5.0)
-
   }
 
 //
@@ -189,5 +177,4 @@ class CounterViewModelTest: XCTestCase {
 //      // Put the code you want to measure the time of here.
 //    }
 //  }
-
 }
