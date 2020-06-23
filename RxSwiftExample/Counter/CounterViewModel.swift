@@ -2,7 +2,6 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-
 //
 // RxSwift + MVVM Example
 //
@@ -19,15 +18,13 @@ import RxSwift
 // delegate
 // observable
 // など多数があるが、あまり難解にならないように、closureにする
-protocol CountCalculator{
-  func countUp(val:Int,completion: @escaping (Result<Int,Error>)-> Void)
-  func countDown(val:Int,completion: @escaping (Result<Int,Error>)-> Void)
+protocol CountCalculator {
+  func countUp(val: Int, completion: @escaping (Result<Int, Error>) -> Void)
+  func countDown(val: Int, completion: @escaping (Result<Int, Error>) -> Void)
 }
 
 class CounterViewModel: ViewModelType {
-
   private let backgroundScheduler = SerialDispatchQueueScheduler(queue: .global(qos: .default), internalSerialQueueName: "com.myapp.background")
-
 
   var input: Input
   var output: Output
@@ -46,55 +43,53 @@ class CounterViewModel: ViewModelType {
   // AnyObserver<T>： Observerを指定する場合。
   // PublishRelay: ボタンタップのようなイベント
   // BehaviorRelay:値の更新？（TODO:INPUT では使わない？イベントを知るのみ）
-  struct Input{
-    let countUp:PublishRelay<Void>
-    let countDown:PublishRelay<Void>
+  struct Input {
+    let countUp: PublishRelay<Void>
+    let countDown: PublishRelay<Void>
   }
 
   // Output
   //  Observerで返す。
   //  メインスレッド実行、エラーを流さない、Shareされることが保証されるDriver,Signalで返すのが良い。
   //  Share= 1つのObservableを共有する。 （2つ以上Subscribeされても、1つのObservableのOnNextを流す。）
-  struct Output{
-    let countLabel:Driver<Int>
-    let isProcessing:Driver<Bool>
+  struct Output {
+    let countLabel: Driver<Int>
+    let isProcessing: Driver<Bool>
   }
 
   // ViewModelが依存する機能 APICallなどを指定する。
   //  Testabilityのために、コンストラクタで指定しViewModel内にハードコーディングしないようにする。
   //
-  struct Dependency{
-    let calculator:CountCalculator
+  struct Dependency {
+    let calculator: CountCalculator
   }
 
   private let disposeBag = DisposeBag()
 
   //
-  init(dependency:Dependency = Dependency(calculator: SimpleCountCalculator())){
-
+  init(dependency: Dependency = Dependency(calculator: SimpleCountCalculator())) {
     // Countの状態を保持する変数。１つの状態を記憶する Subject BehaviorRelayを指定する。
     // BehaviorRelay なので、エラー・Completeは流さない。
     // Subjectのため、外部から値を変更でき、Observerに値を流すことができる。
     // OutputにはこのSubjectをDriver化してセットする。
     let countSubject = BehaviorRelay<Int>(value: 0)
-    let isProcessingSubject = BehaviorRelay<Bool>(value:false)
+    let isProcessingSubject = BehaviorRelay<Bool>(value: false)
 
     // Input 用のPublishRelay。Subscribeして、イベントを捉える。
     let countUpRelay = PublishRelay<Void>() // InputがPublishRelayの場合
     let countDownRelay = PublishRelay<Void>()
 
-
     countUpRelay
 //      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-      .observeOn( backgroundScheduler)  // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
-      .subscribe(onNext: {  _ in
+      .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
+      .subscribe(onNext: { _ in
 
         isProcessingSubject.accept(true)
-        dependency.calculator.countUp(val: countSubject.value){ result in
-          switch(result){
-          case .success(let newVal):
+        dependency.calculator.countUp(val: countSubject.value) { result in
+          switch result {
+          case let .success(newVal):
             countSubject.accept( newVal)
-          case .failure(let error):
+          case let .failure(error):
             print(error)
           }
           isProcessingSubject.accept(false)
@@ -102,18 +97,17 @@ class CounterViewModel: ViewModelType {
       })
       .disposed(by: disposeBag)
 
-
     countDownRelay
 //      .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-      .observeOn( backgroundScheduler)  // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
-      .subscribe(onNext: {_ in
+      .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
+      .subscribe(onNext: { _ in
 
         isProcessingSubject.accept(true)
-        dependency.calculator.countDown(val: countSubject.value){ result in
-          switch(result){
-          case .success(let newVal):
+        dependency.calculator.countDown(val: countSubject.value) { result in
+          switch result {
+          case let .success(newVal):
             countSubject.accept( newVal)
-          case .failure(let error):
+          case let .failure(error):
             print(error)
           }
           isProcessingSubject.accept(false)
@@ -122,20 +116,16 @@ class CounterViewModel: ViewModelType {
       .disposed(by: disposeBag)
 //
 
-    self.output = Output(
+    output = Output(
       countLabel: countSubject.asDriver(),
       isProcessing: isProcessingSubject.asDriver()
     )
 
-    self.input = Input(
+    input = Input(
       countUp: countUpRelay,
       countDown: countDownRelay
     )
 
     self.dependency = dependency
-
-
   }
-
 }
-

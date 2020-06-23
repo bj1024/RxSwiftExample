@@ -20,5 +20,5 @@ protocol ViewModelType {
   associatedtype Dependency
   var input: Input { get }
   var output: Output { get }
-  var dependency: Dependency{ get }
+  var dependency: Dependency { get }
 }

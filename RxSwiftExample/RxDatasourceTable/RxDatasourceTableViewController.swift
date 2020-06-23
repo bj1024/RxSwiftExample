@@ -18,7 +18,6 @@ class RxDatasourceTableViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-
     buttonReload.setTitle("", for: .normal)
   }
 
@@ -37,12 +36,12 @@ class RxDatasourceTableViewController: UIViewController {
     // https://github.com/RxSwiftCommunity/RxDataSources
 
 //    let dataSource = RxTableViewSectionedReloadDataSource<SectionOfCustomData>(
-      let dataSource = RxTableViewSectionedAnimatedDataSource<SectionOfCustomData>(
+    let dataSource = RxTableViewSectionedAnimatedDataSource<SectionOfCustomData>(
       configureCell: { _, tableView, indexPath, item in
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
 //        cell.textLabel?.text = "Item \(item.anInt): \(item.aString) - \(item.aCGPoint.x):\(item.aCGPoint.y)"
 
-        cell.textLabel?.text = "Item \(String(format:"%3d",item.anInt)) \(item.aString) "
+        cell.textLabel?.text = "Item \(String(format: "%3d", item.anInt)) \(item.aString) "
         return cell
       }
     )
@@ -67,13 +66,11 @@ class RxDatasourceTableViewController: UIViewController {
       .bind(to: tableView.rx.items(dataSource: dataSource))
       .disposed(by: disposeBag)
 
-
     buttonReload.rx.tap
       .subscribe { [unowned self] _ in
         self.viewModel.toggleRun()
       }
       .disposed(by: disposeBag)
-
 
     viewModel.runnningTimer
       .map { $0 == nil ? "Start" : "Stop" }
