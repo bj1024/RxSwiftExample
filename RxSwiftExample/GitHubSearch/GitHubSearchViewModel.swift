@@ -31,9 +31,10 @@ class GitHubSearchViewModel: ViewModelType {
     let isProcessingSubject = BehaviorRelay<Bool>(value: false)
 
     keyword
+      .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
       .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
       .filter { ($0.isEmpty || $0.count > 2) }
-      .observeOn( backgroundScheduler) // ThreadをBackgroundに変える OutputのDriverでMainThreadに変更される。
+      .distinctUntilChanged()
       .subscribe(onNext: { str in
 
         if str.isEmpty {
