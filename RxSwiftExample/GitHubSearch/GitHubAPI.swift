@@ -3,6 +3,39 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+protocol DecodeFromJson {
+  func decode(fromjson data: Data) -> Result<Self, Error>
+}
+
+// enum DecodeError: Error {
+//
+//  case decoding(String)
+// }
+
+struct SearchResult: Decodable, DecodeFromJson {
+  func decode(fromjson data: Data) -> Result<SearchResult, Error> {
+    do {
+      let decoder = JSONDecoder()
+      decoder.keyDecodingStrategy = .convertFromSnakeCase
+      let searchResult: SearchResult = try decoder.decode(SearchResult.self, from: data)
+      return .success(searchResult)
+
+    } catch {
+      print("error:", error.localizedDescription)
+      return .failure(error)
+    }
+  }
+
+  let incompleteResults: Bool
+  let totalCount: Int
+  let items: [Item]
+
+  struct Item: Decodable {
+    let id: Int
+    let fullName: String
+  }
+}
+
 public protocol APIRequest: Encodable {
   associatedtype Response: Decodable
 
@@ -11,13 +44,17 @@ public protocol APIRequest: Encodable {
 
 protocol GitHubAPIProtocol {
   func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void)
+
+  func searchObservable(keyword: String) -> Single<SearchResult>
+
   func cancelSearch()
 }
 
 enum APIError: Error {
   case invalidBaseURL(String)
   case request(String)
-  case decoding(String)
+  case nodata
+  case decoding
 }
 
 // Search | GitHub Developer Guide https://developer.github.com/v3/search/
@@ -25,20 +62,47 @@ enum APIError: Error {
 class GitHubAPI: GitHubAPIProtocol {
   //  let queue = DispatchQueue(label: "com.myapp.GitHubAPI", qos: .utility)
 
-  struct SearchResult: Decodable {
-    let incompleteResults: Bool
-    let totalCount: Int
-    let items: [Item]
-
-    struct Item: Decodable {
-      let id: Int
-      let fullName: String
-    }
-  }
-
   var searchDisposable: Disposable?
 
   private let disposeBag = DisposeBag()
+
+  func searchObservable(keyword: String) -> Single<SearchResult> {
+    return Single<SearchResult>.create { single in
+
+      guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {
+        single(.error(APIError.invalidBaseURL(keyword)))
+        return Disposables.create()
+      }
+      let request = URLRequest(url: url)
+
+      let task = URLSession.shared.dataTask(with: request) { data, _, error in
+        if let error = error {
+          single(.error(error))
+          return
+        }
+
+        guard let data = data else {
+          single(.error(APIError.nodata))
+          return
+        }
+
+        do {
+          let decoder = JSONDecoder()
+          decoder.keyDecodingStrategy = .convertFromSnakeCase
+          let searchResult: SearchResult = try decoder.decode(SearchResult.self, from: data)
+          single(.success(searchResult))
+
+        } catch {
+          print("error:", error.localizedDescription)
+          single(.error(APIError.decoding))
+        }
+      }
+
+      task.resume()
+
+      return Disposables.create { task.cancel() }
+    }
+  }
 
   func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void) {
     print("GitHubAPI searching")
@@ -55,39 +119,39 @@ class GitHubAPI: GitHubAPIProtocol {
     let req = URLRequest(url: url)
 
 //    searchDisposable = URLSession.shared.rx.data(request: req)
-    searchDisposable = URLSession.shared.rx.response(request: req)
-      .subscribe(
-        onNext: { data in
-          print("data=[\(data)]" )
-
-          let decoder = JSONDecoder()
-          decoder.keyDecodingStrategy = .convertFromSnakeCase
-
-          // debug
-          if let dataStr = String(data: data, encoding: .utf8) {
-            print("dataStr=\(dataStr)")
-          }
-          do {
-            let json: SearchResult = try decoder.decode(SearchResult.self, from: data)
-            print(json)
-            completion(.success(["\(json)"]))
-
-          } catch {
-            print("error:", error.localizedDescription)
-            completion(.failure(APIError.decoding(error.localizedDescription)))
-          }
-        },
-        onError: { error in
-          completion(.failure(APIError.request(error.localizedDescription)))
-        },
-        onCompleted: {
-          print("onCompleted")
-
-        },
-        onDisposed: {
-          print("onDisposed")
-        }
-      )
+//    searchDisposable = URLSession.shared.rx.response(request: req)
+//      .subscribe(
+//        onNext: { data in
+//          print("data=[\(data)]" )
+//
+//          let decoder = JSONDecoder()
+//          decoder.keyDecodingStrategy = .convertFromSnakeCase
+//
+//          // debug
+//          if let dataStr = String(data: data, encoding: .utf8) {
+//            print("dataStr=\(dataStr)")
+//          }
+//          do {
+//            let json: SearchResult = try decoder.decode(SearchResult.self, from: data)
+//            print(json)
+//            completion(.success(["\(json)"]))
+//
+//          } catch {
+//            print("error:", error.localizedDescription)
+//            completion(.failure(APIError.decoding(error.localizedDescription)))
+//          }
+//        },
+//        onError: { error in
+//          completion(.failure(APIError.request(error.localizedDescription)))
+//        },
+//        onCompleted: {
+//          print("onCompleted")
+//
+//        },
+//        onDisposed: {
+//          print("onDisposed")
+//        }
+//      )
   }
 
   func cancelSearch() {
@@ -134,16 +198,17 @@ class GitHubAPI: GitHubAPIProtocol {
 //  }
 }
 
-class GitHubAPIDummy: GitHubAPIProtocol {
-  func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void) {
-    print("GitHubAPI searching")
-    Thread.sleep(forTimeInterval: 3.0)
-    var newValue: [String] = ["keyword is [\(keyword)]"]
-    newValue.append(contentsOf:
-      "🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳".map { String($0) }
-    )
-    completion(.success(newValue))
-  }
-
-  func cancelSearch() {}
-}
+//
+// class GitHubAPIDummy: GitHubAPIProtocol {
+//  func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void) {
+//    print("GitHubAPI searching")
+//    Thread.sleep(forTimeInterval: 3.0)
+//    var newValue: [String] = ["keyword is [\(keyword)]"]
+//    newValue.append(contentsOf:
+//      "🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳".map { String($0) }
+//    )
+//    completion(.success(newValue))
+//  }
+//
+//  func cancelSearch() {}
+// }
