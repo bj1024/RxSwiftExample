@@ -30,7 +30,7 @@
       codeCoverageEnabled = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2016374624978E1E00291257"
@@ -40,12 +40,22 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2016375124978E1E00291257"
                BuildableName = "RxSwiftExampleUITests.xctest"
                BlueprintName = "RxSwiftExampleUITests"
+               ReferencedContainer = "container:RxSwiftExample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2016D67024A45C390087E89C"
+               BuildableName = "RxSwiftExampleGithubTests.xctest"
+               BlueprintName = "RxSwiftExampleGithubTests"
                ReferencedContainer = "container:RxSwiftExample.xcodeproj">
             </BuildableReference>
          </TestableReference>

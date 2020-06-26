@@ -39,6 +39,26 @@ class GitHubAPITest: XCTestCase {
     wait(for: [expectation], timeout: 30.0)
   }
 
+  func testSearchObservable() throws {
+    let expectation = XCTestExpectation(description: "Test")
+
+    let api = GitHubAPI()
+    api.searchObservable(keyword: "swift")
+      .subscribe { event in
+        switch event {
+        case let .success(searchResult):
+          print("Result: ", searchResult)
+        case let .error(error):
+          print("Error: ", error)
+        }
+
+        expectation.fulfill()
+      }
+      .disposed(by: disposeBag)
+
+    wait(for: [expectation], timeout: 30.0)
+  }
+
   func testCancel() throws {
     let expectation = XCTestExpectation(description: "Test")
 
