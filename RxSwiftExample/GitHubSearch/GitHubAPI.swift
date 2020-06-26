@@ -4,7 +4,7 @@ import RxCocoa
 import RxSwift
 
 protocol DecodeFromJson {
-  func decode(fromjson data: Data) -> Result<Self, Error>
+  static func decode(fromJsonData data: Data) -> Result<Self, Error>
 }
 
 // enum DecodeError: Error {
@@ -13,7 +13,7 @@ protocol DecodeFromJson {
 // }
 
 struct SearchResult: Decodable, DecodeFromJson {
-  func decode(fromjson data: Data) -> Result<SearchResult, Error> {
+  static func decode(fromJsonData data: Data) -> Result<SearchResult, Error> {
     do {
       let decoder = JSONDecoder()
       decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -85,14 +85,11 @@ class GitHubAPI: GitHubAPIProtocol {
           single(.error(APIError.nodata))
           return
         }
-
-        do {
-          let decoder = JSONDecoder()
-          decoder.keyDecodingStrategy = .convertFromSnakeCase
-          let searchResult: SearchResult = try decoder.decode(SearchResult.self, from: data)
+        let decoded = SearchResult.decode(fromJsonData: data)
+        switch decoded {
+        case let .success(searchResult):
           single(.success(searchResult))
-
-        } catch {
+        case let .failure(error):
           print("error:", error.localizedDescription)
           single(.error(APIError.decoding))
         }
