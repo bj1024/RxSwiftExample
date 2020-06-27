@@ -1,76 +1,146 @@
-
 import Foundation
 import RxCocoa
 import RxSwift
 
 protocol DecodeFromJson {
-  static func decode(fromJsonData data: Data) -> Result<Self, Error>
+//  static func decode(fromJsonData data: Data) -> Result<Self, Error>
+
+  static var keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy? { get }
 }
 
-// enum DecodeError: Error {
+// protocol URLSessionDataTaskProtocol {
+//  func resume()
+//  func cancel()
+// }
 //
-//  case decoding(String)
+// protocol URLSessionProtocol { typealias DataTaskResult = (Data?, URLResponse?, Error?) -> Void
+//    func dataTask(with request: URLRequest, completionHandler: @escaping DataTaskResult) -> URLSessionDataTaskProtocol
 // }
 
-struct SearchResult: Decodable, DecodeFromJson {
-  static func decode(fromJsonData data: Data) -> Result<SearchResult, Error> {
+// extension URLSessionDataTask: URLSessionDataTaskProtocol {}
+//
+// extension URLSession: URLSessionProtocol {
+//
+//  func dataTask(with request: URLRequest, completionHandler: @escaping DataTaskResult) -> URLSessionDataTaskProtocol {
+//    return dataTask(with: request, completionHandler: completionHandler) as URLSessionDataTaskProtocol
+//  }
+//
+////    func dataTask(with request: URLRequest, completionHandler: @escaping DataTaskResult) -> URLSessionDataTaskProtocol {
+////        return dataTask(with: request, completionHandler: completionHandler) as URLSessionDataTaskProtocol
+////    }
+// }
+
+struct APIDecorder {
+  static func decode<T: Decodable & DecodeFromJson>(fromJsonData data: Data) -> Result<T, Error> {
     do {
       let decoder = JSONDecoder()
-      decoder.keyDecodingStrategy = .convertFromSnakeCase
-      let searchResult: SearchResult = try decoder.decode(SearchResult.self, from: data)
-      return .success(searchResult)
+      if let keyDecodingStrategy = T.keyDecodingStrategy {
+        decoder.keyDecodingStrategy = keyDecodingStrategy
+      }
+      let result: T = try decoder.decode(T.self, from: data)
+      return .success(result)
 
     } catch {
       print("error:", error.localizedDescription)
       return .failure(error)
     }
   }
+}
+
+struct APIEncoder {
+  static func toJson<T: Encodable>(data: T) -> Result<String, Error> {
+    let encoder = JSONEncoder()
+    do {
+      let data = try encoder.encode(data)
+      let jsonstr: String = String(data: data, encoding: .utf8)!
+      return .success(jsonstr)
+    } catch {
+      print(error.localizedDescription)
+      return .failure(error)
+    }
+  }
+}
+
+struct GitHubRepoSearchResult: Decodable, Encodable, DecodeFromJson {
+  static var keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy? = .convertFromSnakeCase
+  struct Item: Decodable, Encodable {
+    let id: Int
+    let fullName: String
+  }
 
   let incompleteResults: Bool
   let totalCount: Int
   let items: [Item]
-
-  struct Item: Decodable {
-    let id: Int
-    let fullName: String
-  }
 }
 
-public protocol APIRequest: Encodable {
-  associatedtype Response: Decodable
-
-  var path: String { get }
-}
+//
+// public protocol APIRequest: Encodable {
+//  associatedtype Response: Decodable
+//
+//  var path: String { get }
+// }
 
 protocol GitHubAPIProtocol {
   func search(keyword: String, completion: @escaping (Result<[String], Error>) -> Void)
 
-  func searchObservable(keyword: String) -> Single<SearchResult>
+  func searchObservable(keyword: String) -> Single<GitHubRepoSearchResult>
 
   func cancelSearch()
 }
 
-enum APIError: Error {
-  case invalidBaseURL(String)
-  case request(String)
-  case nodata
-  case decoding
-}
+//
+// class API  {
+//  var searchDisposable: Disposable?
+//
+//  private let disposeBag = DisposeBag()
+//
+//  func searchObservable(keyword: String) -> Single<SearchResult> {
+//    return Single<SearchResult>.create { single in
+//
+//      guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {
+//        single(.error(APIError.invalidBaseURL(keyword)))
+//        return Disposables.create()
+//      }
+//      let request = URLRequest(url: url)
+//
+//      let task = URLSession.shared.dataTask(with: request) { data, _, error in
+//        if let error = error {
+//          single(.error(error))
+//          return
+//        }
+//        guard let data = data else {
+//          single(.error(APIError.nodata))
+//          return
+//        }
+//        let decoded:Result<SearchResult,Error> = APIDecorder.decode(fromJsonData: data)
+//        switch decoded {
+//        case let .success(searchResult):
+//          single(.success(searchResult))
+//        case let .failure(error):
+//          print("error:", error.localizedDescription)
+//          single(.error(APIError.decoding))
+//        }
+//      }
+//
+//      task.resume()
+//
+//      return Disposables.create { task.cancel() }
+//    }
+//  }
+// }
 
 // Search | GitHub Developer Guide https://developer.github.com/v3/search/
-
 class GitHubAPI: GitHubAPIProtocol {
   //  let queue = DispatchQueue(label: "com.myapp.GitHubAPI", qos: .utility)
 
   var searchDisposable: Disposable?
-
   private let disposeBag = DisposeBag()
 
-  func searchObservable(keyword: String) -> Single<SearchResult> {
-    return Single<SearchResult>.create { single in
+  func searchObservable(keyword: String) -> Single<GitHubRepoSearchResult> {
+    return Single<GitHubRepoSearchResult>.create { [unowned self] single in
 
       guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {
-        single(.error(APIError.invalidBaseURL(keyword)))
+        single(.error(GitHubAPIError.invalidBaseURL(keyword)))
         return Disposables.create()
       }
       let request = URLRequest(url: url)
@@ -80,18 +150,17 @@ class GitHubAPI: GitHubAPIProtocol {
           single(.error(error))
           return
         }
-
         guard let data = data else {
-          single(.error(APIError.nodata))
+          single(.error(GitHubAPIError.nodata))
           return
         }
-        let decoded = SearchResult.decode(fromJsonData: data)
+        let decoded: Result<GitHubRepoSearchResult, Error> = APIDecorder.decode(fromJsonData: data)
         switch decoded {
         case let .success(searchResult):
           single(.success(searchResult))
         case let .failure(error):
           print("error:", error.localizedDescription)
-          single(.error(APIError.decoding))
+          single(.error(GitHubAPIError.decoding))
         }
       }
 
@@ -107,7 +176,7 @@ class GitHubAPI: GitHubAPIProtocol {
     // make url
     guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {
 //      guard let url = URL(string: "https://notexist.example.com/search/repositories?q=\(keyword)") else {  // error test
-      completion(.failure(APIError.invalidBaseURL("url create error.")))
+      completion(.failure(GitHubAPIError.invalidBaseURL("url create error.")))
       return
     }
 
@@ -209,3 +278,76 @@ class GitHubAPI: GitHubAPIProtocol {
 //
 //  func cancelSearch() {}
 // }
+
+enum GitHubAPIError: Error {
+  case invalidBaseURL(String)
+  case invalidurl
+  case request(String)
+  case nodata
+  case decoding
+}
+
+struct GitHubSearchAPIRequest: APIRequest {
+  func makeRequest(from keyword: String) throws -> URLRequest {
+    guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else {
+      throw GitHubAPIError.invalidurl
+    }
+    return URLRequest(url: url)
+  }
+
+  func parseResponse(data: Data) throws -> GitHubRepoSearchResult {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return try decoder.decode(GitHubRepoSearchResult.self, from: data)
+  }
+
+//  func makeRequest(from coordinate: CLLocationCoordinate2D) throws -> URLRequest {
+//    guard CLLocationCoordinate2DIsValid(coordinate) else {
+//      throw RequestError.invalidCoordinate
+//    }
+//    var components = URLComponents(string: "https://example.com/locations")!
+//    components.queryItems = [
+//      URLQueryItem(name: "lat", value: "\(coordinate.latitude)"),
+//      URLQueryItem(name: "long", value: "\(coordinate.longitude)")
+//    ]
+//    return URLRequest(url: components.url!)
+//  }
+//
+//  func parseResponse(data: Data) throws -> [PointOfInterest] {
+//    return try JSONDecoder().decode([PointOfInterest].self, from: data)
+//  }
+}
+
+class GitHubSearch {
+  var urlSession: URLSession = URLSession.shared
+
+  init(urlSession: URLSession = URLSession.shared) {
+    self.urlSession = urlSession
+  }
+
+  func repositories_apiclosure(keyword: String) -> Single<GitHubRepoSearchResult> {
+    return Single<GitHubRepoSearchResult>.create { [unowned self] single in
+//      let request = GitHubSearchAPIRequest()
+//      let urlSession = URLSession.shared
+      let request = GitHubSearchAPIRequest()
+      let loader = APIRequestLoader(apiRequest: request, urlSession: self.urlSession)
+      let task = loader.loadAPIRequest(requestData: keyword) { result in
+        switch result {
+        case let .success(searchResult):
+          single(.success(searchResult))
+        case let .failure(error):
+          print("error:", error.localizedDescription)
+          single(.error(GitHubAPIError.decoding))
+        }
+      }
+
+      return Disposables.create { task?.cancel() }
+    }
+  }
+
+  func repositories(keyword: String) -> Single<GitHubRepoSearchResult> {
+    let request = GitHubSearchAPIRequest()
+    let loader = APIRequestLoader(apiRequest: request, urlSession: urlSession)
+    return loader.loadAPIRequest(requestData: keyword)
+  }
+}

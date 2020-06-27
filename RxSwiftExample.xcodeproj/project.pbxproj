@@ -22,6 +22,10 @@
 		2016377124985CBE00291257 /* GitHubSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016377024985CBE00291257 /* GitHubSearchViewModel.swift */; };
 		2016D67424A45C390087E89C /* RxSwiftExampleGithubTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016D67324A45C390087E89C /* RxSwiftExampleGithubTests.swift */; };
 		2016D69424A581B90087E89C /* GitHubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CBDD4124A0BB7E00704C16 /* GitHubAPI.swift */; };
+		2016D6CC24A61BCA0087E89C /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016D6CB24A61BCA0087E89C /* APIRequest.swift */; };
+		2016D6CD24A716040087E89C /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016D6CB24A61BCA0087E89C /* APIRequest.swift */; };
+		2016D6D024A73D3E0087E89C /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016D6CE24A73D300087E89C /* MockURLProtocol.swift */; };
+		2016D6D124A73D420087E89C /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016D6CE24A73D300087E89C /* MockURLProtocol.swift */; };
 		20CBDD4024A0A6DB00704C16 /* ViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CBDD3F24A0A6DB00704C16 /* ViewModelType.swift */; };
 		20CBDD4224A0BB7E00704C16 /* GitHubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CBDD4124A0BB7E00704C16 /* GitHubAPI.swift */; };
 		20CBDD4524A19D1100704C16 /* GitHubAPITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CBDD4324A19C6900704C16 /* GitHubAPITest.swift */; };
@@ -88,6 +92,8 @@
 		2016D67124A45C390087E89C /* RxSwiftExampleGithubTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxSwiftExampleGithubTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2016D67324A45C390087E89C /* RxSwiftExampleGithubTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxSwiftExampleGithubTests.swift; sourceTree = "<group>"; };
 		2016D67524A45C390087E89C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2016D6CB24A61BCA0087E89C /* APIRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
+		2016D6CE24A73D300087E89C /* MockURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		20CBDD3F24A0A6DB00704C16 /* ViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelType.swift; sourceTree = "<group>"; };
 		20CBDD4124A0BB7E00704C16 /* GitHubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAPI.swift; sourceTree = "<group>"; };
 		20CBDD4324A19C6900704C16 /* GitHubAPITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAPITest.swift; sourceTree = "<group>"; };
@@ -216,6 +222,8 @@
 			isa = PBXGroup;
 			children = (
 				2016376A2498454500291257 /* GitHubSearch.storyboard */,
+				2016D6CB24A61BCA0087E89C /* APIRequest.swift */,
+				2016D6CE24A73D300087E89C /* MockURLProtocol.swift */,
 				20CBDD4124A0BB7E00704C16 /* GitHubAPI.swift */,
 				20CBDD4324A19C6900704C16 /* GitHubAPITest.swift */,
 				2016376C2498455600291257 /* GitHubSearchViewController.swift */,
@@ -582,6 +590,7 @@
 				2016373524978E1D00291257 /* AppDelegate.swift in Sources */,
 				20CBDD4024A0A6DB00704C16 /* ViewModelType.swift in Sources */,
 				20CBDD4224A0BB7E00704C16 /* GitHubAPI.swift in Sources */,
+				2016D6CC24A61BCA0087E89C /* APIRequest.swift in Sources */,
 				2016376F24985B5B00291257 /* CounterViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -593,6 +602,7 @@
 				2016374C24978E1E00291257 /* RxSwiftExampleTests.swift in Sources */,
 				20CBDD4524A19D1100704C16 /* GitHubAPITest.swift in Sources */,
 				20D15840249F33030028DF30 /* CounterViewModelTest.swift in Sources */,
+				2016D6D124A73D420087E89C /* MockURLProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,7 +619,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				2016D67424A45C390087E89C /* RxSwiftExampleGithubTests.swift in Sources */,
+				2016D6CD24A716040087E89C /* APIRequest.swift in Sources */,
 				2016D69424A581B90087E89C /* GitHubAPI.swift in Sources */,
+				2016D6D024A73D3E0087E89C /* MockURLProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
