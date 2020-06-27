@@ -109,6 +109,7 @@ class GitHubSearchViewModel: ViewModelType {
     guard let url = URL(string: "https://api.github.com/search/repositories?q=\(keyword)") else { return .just([]) }
     let observableResult: Observable<[String]> = URLSession.shared.rx.json(url: url)
       .map { json -> ([String]) in
+
         guard let dict = json as? [String: Any] else { return [] }
         guard let items = dict["items"] as? [[String: Any]] else { return [] }
         let repos = items.compactMap { $0["full_name"] as? String }
