@@ -1,7 +1,3 @@
-//
-// Copyright (c) 2020, mycompany All rights reserved.
-//
-
 import Foundation
 
 import RxCocoa

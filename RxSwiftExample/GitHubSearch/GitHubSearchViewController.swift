@@ -1,6 +1,3 @@
-//
-// Copyright (c) 2020, mycompany All rights reserved.
-//
 
 import UIKit
 
@@ -14,6 +11,7 @@ class GitHubSearchViewController: UIViewController {
   private let disposeBag = DisposeBag()
 
   @IBOutlet var tableView: UITableView!
+  @IBOutlet var buttonShowAlert: UIButton!
 
   @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
@@ -63,6 +61,9 @@ class GitHubSearchViewController: UIViewController {
 
     searchController.searchBar.rx.text.orEmpty.bind(to: viewModel.input.keyword)
       .disposed(by: disposeBag)
+
+    buttonShowAlert.rx.tap.bind(to: viewModel.input.showAlert )
+      .disposed(by: disposeBag)
 //
 //    viewModel.keyword
 //    .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
@@ -88,12 +89,38 @@ class GitHubSearchViewController: UIViewController {
       })
       .disposed(by: disposeBag)
 
+    viewModel.output.showAlertMessage
+      .drive(onNext: { [unowned self] val in
+        guard let message = val else { return }
+        self.showAlert(mes: message)
+
+      })
+      .disposed(by: disposeBag)
+
 //    viewModel.isProcessing.map{ !$0 }
 //      .bind(to: activityIndicator.rx.isHidden)
 //    .disposed(by: disposeBag)
 //    viewModel.isProcessing.map{ $0 }
 //      .bind(to: activityIndicator.rx.isAnimating)
 //    .disposed(by: disposeBag)
+  }
+
+  func showAlert( mes: String) {
+    let alert = UIAlertController(title: "",
+                                  message: mes,
+                                  preferredStyle: UIAlertController.Style.alert)
+
+    let defaultAction = UIAlertAction(title: "OK", style: .default) { _ in
+      print("OK")
+    }
+    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+      print("cancel")
+    }
+
+    alert.addAction(cancelAction)
+    alert.addAction(defaultAction)
+
+    present(alert, animated: true, completion: nil)
   }
 }
 

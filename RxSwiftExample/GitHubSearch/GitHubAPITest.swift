@@ -1,7 +1,3 @@
-//
-// Copyright (c) 2020, mycompany All rights reserved.
-//
-
 import XCTest
 
 import RxCocoa
@@ -56,101 +52,6 @@ class GitHubAPITest: XCTestCase {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
   }
 
-  func testSearch() throws {
-    let expectation = XCTestExpectation(description: "Test")
-
-    let api = GitHubAPI()
-    api.search(keyword: "swift") { result in
-      switch result {
-      case let .success(searchResult):
-        print("searchResult=\(searchResult)")
-      case let .failure(error):
-        print("error=\(error)")
-        //        self.XCTAssert(false, "\(error)")(
-      }
-
-      expectation.fulfill()
-    }
-
-    wait(for: [expectation], timeout: 30.0)
-  }
-
-  func testSearchObservable() throws {
-    let expectation = XCTestExpectation(description: "Test")
-
-    let api = GitHubAPI()
-    api.searchObservable(keyword: "swift")
-      .subscribe { event in
-        switch event {
-        case let .success(searchResult):
-          print("Result: ", searchResult)
-          let res = APIEncoder.toJson(data: searchResult)
-          switch res {
-          case let .success(json):
-            print("toJson=[\(json)]")
-          case let .failure(error):
-            print(error)
-          }
-
-        case let .error(error):
-          print("Error: ", error)
-        }
-
-        expectation.fulfill()
-      }
-      .disposed(by: disposeBag)
-
-    wait(for: [expectation], timeout: 30.0)
-  }
-
-  func testAPIRequest() throws {
-    let expectation = XCTestExpectation(description: "Test")
-
-    let api = GitHubAPI()
-    api.searchObservable(keyword: "swift")
-      .subscribe { event in
-        switch event {
-        case let .success(searchResult):
-          print("Result: ", searchResult)
-          let res = APIEncoder.toJson(data: searchResult)
-          switch res {
-          case let .success(json):
-            print("toJson=[\(json)]")
-          case let .failure(error):
-            print(error)
-          }
-
-        case let .error(error):
-          print("Error: ", error)
-        }
-
-        expectation.fulfill()
-      }
-      .disposed(by: disposeBag)
-
-    wait(for: [expectation], timeout: 30.0)
-  }
-
-  func testCancel() throws {
-    let expectation = XCTestExpectation(description: "Test")
-
-    let api = GitHubAPI()
-    api.search(keyword: "swift") { result in
-      switch result {
-      case let .success(searchResult):
-        print("searchResult=\(searchResult)")
-      case let .failure(error):
-        print("error=\(error)")
-        //        self.XCTAssert(false, "\(error)")(
-      }
-
-      expectation.fulfill()
-    }
-
-    api.cancelSearch()
-    wait(for: [expectation], timeout: 30.0)
-  }
-
   func testGitHubAPIRepositories() throws {
     let expectation = XCTestExpectation(description: "Test")
 
@@ -184,7 +85,7 @@ class GitHubAPITest: XCTestCase {
     configuration.protocolClasses = [MockURLProtocol.self]
     let urlSession = URLSession(configuration: configuration)
 
-    let api = GitHubSearch()
+    let api = GitHubAPI()
     api.urlSession = urlSession
 
     api.repositories(keyword: keyword)
@@ -221,7 +122,7 @@ class GitHubAPITest: XCTestCase {
     configuration.protocolClasses = [MockURLProtocol.self]
     let urlSession = URLSession(configuration: configuration)
 
-    let api = GitHubSearch()
+    let api = GitHubAPI()
     api.urlSession = urlSession
 
     XCTAssertFalse(MockURLProtocol.isStopLoadingCalled) // StopLoading が未Callを確認
