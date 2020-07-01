@@ -209,31 +209,11 @@ class GitHubAPITest: XCTestCase {
   }
 
   func testGitHubAPIRepositoriesCancel() throws {
-    let expectation = XCTestExpectation(description: "Test")
-
-    let json = """
-    {
-        "incomplete_results":true,
-        "total_count":9999,
-        "items":[{
-                "full_name":"test_fullname",
-                "id":1234567890,
-                "name":"test_name"
-        }]
-    }
-    """
-
-    let keyword = "swift"
-
     // MockのClosureを指定して、テストする。
-    let mockJSONData = json.data(using: .utf8)!
-    MockURLProtocol.requestHandler = { request in
-
-      // request に keywordが含まれているかチェックする。
-      XCTAssertEqual(request.url?.query?.contains(keyword), true)
-
+//    let mockJSONData = json.data(using: .utf8)!
+    MockURLProtocol.requestHandler = { _ in
       // ダミーデータを返す。
-      return (HTTPURLResponse(), mockJSONData)
+      (HTTPURLResponse(), "dummy".data(using: .utf8)!)
     }
 
     // Mockを利用するURLSessionを定義する。
