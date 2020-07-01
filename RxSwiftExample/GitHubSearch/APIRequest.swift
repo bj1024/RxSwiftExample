@@ -12,6 +12,7 @@ protocol APIRequest {
 enum APIError: Error {
   case canceled
   case nullData
+  case param
 }
 
 class APIRequestLoader<T: APIRequest> {
