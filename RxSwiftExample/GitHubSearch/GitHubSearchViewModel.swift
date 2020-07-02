@@ -35,8 +35,8 @@ class GitHubSearchViewModel: ViewModelType {
     let showAlertMessageSubject = BehaviorRelay<String?>(value: nil)
 
     keyword
-      .observeOn(backgroundScheduler) // 処理ThreadをBackgroundに変える。OutputのDriverでMainThreadに変更される。
-      .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
+//      .observeOn(backgroundScheduler) // 処理ThreadをBackgroundに変える。OutputのDriverでMainThreadに変更される。
+      .debounce(.milliseconds(1000), scheduler: backgroundScheduler)
       .filter { ($0.isEmpty || $0.count > 2) }
       .distinctUntilChanged()
       .flatMap { keyword -> Observable<GitHubRepoSearchResult> in
