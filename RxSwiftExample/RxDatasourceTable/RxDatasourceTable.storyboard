@@ -20,7 +20,7 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="774"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="RzS-fy-bge">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="727"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="744"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="HCi-eU-yaB">
@@ -33,12 +33,6 @@
                                             </tableViewCell>
                                         </prototypes>
                                     </tableView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cP7-uO-6eH">
-                                        <rect key="frame" x="0.0" y="727" width="414" height="17"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" id="6dz-8g-p8K">
                                         <rect key="frame" x="0.0" y="744" width="414" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -70,7 +64,6 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="buttonReload" destination="khw-Vg-nr6" id="EVQ-1n-hej"/>
-                        <outlet property="lblStatus" destination="cP7-uO-6eH" id="UXs-kE-CzY"/>
                         <outlet property="tableView" destination="RzS-fy-bge" id="deh-da-F8b"/>
                     </connections>
                 </viewController>

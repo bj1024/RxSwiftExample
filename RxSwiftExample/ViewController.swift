@@ -60,12 +60,12 @@ class ViewController: UIViewController {
     super.viewDidAppear(animated)
 
     if !isBinded {
-      bind()
+      bindViewModel()
       isBinded = true
     }
   }
 
-  private func bind() {
+  private func bindViewModel() {
     menus.bind(to: tableView.rx.items(cellIdentifier: "tableViewCell")) { index, menu, cell in
       cell.accessoryType = .disclosureIndicator
       cell.textLabel?.text = "\(index + 1)  \(menu.name)"
