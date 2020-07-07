@@ -114,7 +114,6 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
 
     var newItems: [CustomData] = []
     for i in 0 ..< num {
-//      print("i=\(i)")
       newItems.append(
         createItem(idx: i)
       )
