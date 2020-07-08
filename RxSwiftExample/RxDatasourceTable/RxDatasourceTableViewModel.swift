@@ -49,8 +49,8 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
   var status = BehaviorRelay<String>(value: "")
 
   let sectionTitle = ["items"]
-  let characters = Array("🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳")
-
+//  let characters = Array("🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳")
+  let characters: [String] = "🍎🐶🍊🐺🍋🐱🍒🐭🍇🐹🍉🐰🍓🐸🍑🐯🍈🐨🍌🐻🍐🐷🍍🐥🍠🐢🍆🐝🍅🐞🌽🐳".compactMap { $0 }.map { String($0) }
   enum RunStep {
     case create
     case sort
@@ -182,7 +182,7 @@ class RxDatasourceTableViewModel: RxDatasourceTableModelProtocol {
   }
 
   private func createItem(idx: Int) -> CustomData {
-    let str = String(characters[idx % characters.count])
+    let str = characters[idx % characters.count]
     return CustomData(
       anInt: idx,
       aString: str,
